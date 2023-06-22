@@ -1,4 +1,5 @@
-# Recess-pIn this project i am creating a system that addresses the given problem identified in a sacco
+#Uprise Sacco System
+In this project i am creating a system that addresses the given problem identified in a sacco
 Uprise Sacco has been operational for more than 1 year. The Sacco members save and can request for loans, which they pay back within a specific period of time as per the memorandum that governs the Sacco. Currently, the sacco is struggling with keeping track of its performance and as such, it has decided to acquire a system to help them achieve the objective. The system is expected to do the following:
 Using a command line interface, also known as the uprise client, members will be able to do the following 
 Log into the system using the command 
