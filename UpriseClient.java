@@ -7,9 +7,9 @@ public class UpriseClient {
 
     public static void main(String[] args) {
         try {
-            Socket s = new Socket("localhost", 6676);
+            Socket s = new Socket("localhost", 6666);
             DataOutputStream dout = new DataOutputStream(s.getOutputStream());
-            Scanner commandScanner = new Scanner(System.in); // Input object for getting commands from user
+            Scanner command = new Scanner(System.in); // Input object for getting commands from user
 
             System.out.println("\n----------------------------------------------------------------------");
             System.out.println("Welcome to Uprise Client Interface.");
@@ -17,21 +17,50 @@ public class UpriseClient {
 
             // Command
             System.out.println("login username password ");
-            login = commandScanner.nextLine();
+            login = command.nextLine();
+            do {
+                if (login.equalsIgnoreCase("login")) {
+                    dout.writeUTF(login);
 
-            if (login.equalsIgnoreCase("login")) {
-                dout.writeUTF(login);
-                dout.flush();
-                dout.close();
-                s.close();
+                    // if(){
+                    // System.out.println("deposit amount date_deposited receipt_number");
+                    // System.out.println("CheckStatement dateFrom DateTo");
+                    // System.out.println("requestLoan amount paymentPeriod_in_months");
+                    // System.out.println("LoanRequestStatus loan_application_number");
+                    // System.out.println("Withdraw amount date_withdraw receipt_number");
 
-            } else {
-                System.out.println("Please follow the menu to enter correct commands");
+                    // }
+                    // else{
+                    // System.out.println("Enter your member number and phone number "}
+                    // System.out.println("MemberNumber number /n phoneNumber phonenumber");
+                    // memberNumber = command.nextLine();
+                    // phoneNumber = command.nextLine();
+                    // dout.writeUTF(memberNumber);
+                    // dout.writeUTF(phoneNumber); #server sends a phone number and a member number
+                    // read the stream and get verified or unverified information
 
-            }
+                    // if (the stream contains information) {
+                    // store password
+                    // password = dout.readUTF();
+                    // }
+                    // else{
+                    // System.out.println("return after a day");
+                    // }
+                    //
+
+                    // }
+                    dout.flush();
+                    dout.close();
+                    s.close();
+
+                } else {
+                    System.out.println("Please follow the menu to enter correct commands");
+
+                }
+            } while (login != "exit");
 
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 }
