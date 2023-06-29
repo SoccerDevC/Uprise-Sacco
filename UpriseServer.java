@@ -5,11 +5,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Server {
+public class UpriseServer {
     private static final int PORT = 12345;
     private List<Socket> clients;
 
-    public Server() {
+    public UpriseServer() {
         clients = new ArrayList<>();
     }
 
@@ -46,7 +46,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = new Server();
+        UpriseServer server = new UpriseServer();
         server.start();
     }
 

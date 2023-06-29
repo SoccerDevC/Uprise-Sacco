@@ -69,7 +69,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
+public class UpriseClient {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
 
@@ -106,7 +106,7 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        Client client = new Client();
+        UpriseClient client = new UpriseClient();
         client.start();
     }
 }
