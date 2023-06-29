@@ -4,10 +4,16 @@ import java.net.Socket;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class UpriseServer {
     private static final int PORT = 12345;
     private List<Socket> clients;
+    Connection connection = null;
 
     public UpriseServer() {
         clients = new ArrayList<>();
@@ -43,6 +49,21 @@ public class UpriseServer {
                 }
             }
         }
+    }
+
+    public void databaseConnect() throws IOException {
+        String url = "jdbc:mysql://localhost:3306/mydatabase"; // Replace "mydatabase" with your database name
+        String username = "your_username";
+        String password = "your_password";
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+
     }
 
     public static void main(String[] args) {
@@ -156,48 +177,140 @@ public class UpriseServer {
         }
 
         private boolean verifyLogin(String username, String password) {
-            // Simulated login verification logic
-            // Replace with your own implementation
+            // try {
+            // String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+            // PreparedStatement statement = connection.prepareStatement(query);
+            // statement.setString(1, username);
+            // statement.setString(2, password);
+            // ResultSet resultSet = statement.executeQuery();
+            // return resultSet.next();
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
+            // return false;
             return true;
         }
 
         private void processDeposit(double amount, LocalDate dateDeposited, int receiptNumber) {
-            // Simulated deposit processing logic
-            // Replace with your own implementation
+            // try {
+            // String query = "INSERT INTO deposits (amount, date_deposited, receipt_number)
+            // VALUES (?, ?, ?)";
+            // PreparedStatement statement = connection.prepareStatement(query);
+            // statement.setDouble(1, amount);
+            // statement.setDate(2, java.sql.Date.valueOf(dateDeposited));
+            // statement.setInt(3, receiptNumber);
+            // statement.executeUpdate();
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
         }
 
         private String generateStatement(LocalDate dateFrom, LocalDate dateTo) {
-            // Simulated statement generation logic
-            // Replace with your own implementation
-            return "Statement";
+            // StringBuilder statementBuilder = new StringBuilder();
+            // try {
+            // String query = "SELECT * FROM deposits WHERE date_deposited >= ? AND
+            // date_deposited <= ?";
+            // PreparedStatement preparedStatement = connection.prepareStatement(query);
+            // preparedStatement.setDate(1, java.sql.Date.valueOf(dateFrom));
+            // preparedStatement.setDate(2, java.sql.Date.valueOf(dateTo));
+            // ResultSet resultSet = preparedStatement.executeQuery();
+            // while (resultSet.next()) {
+            // double amount = resultSet.getDouble("amount");
+            // LocalDate dateDeposited = resultSet.getDate("date_deposited").toLocalDate();
+            // int receiptNumber = resultSet.getInt("receipt_number");
+            // statementBuilder.append("Amount: ").append(amount).append(", Date Deposited:
+            // ")
+            // .append(dateDeposited).append(", Receipt Number:
+            // ").append(receiptNumber).append("\n");
+            // }
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
+            // return statementBuilder.toString();
+            return "statement";
         }
 
         private String processLoanRequest(double amount, int paymentPeriod) {
-            // Simulated loan request processing logic
-            // Replace with your own implementation
+            // String loanApplicationNumber = null;
+            // try {
+            // String query = "INSERT INTO loans (amount, payment_period) VALUES (?, ?)";
+            // PreparedStatement statement = connection.prepareStatement(query,
+            // PreparedStatement.RETURN_GENERATED_KEYS);
+            // statement.setDouble(1, amount);
+            // statement.setInt(2, paymentPeriod);
+            // statement.executeUpdate();
+
+            // ResultSet generatedKeys = statement.getGeneratedKeys();
+            // if (generatedKeys.next()) {
+            // loanApplicationNumber = String.valueOf(generatedKeys.getInt(1));
+            // }
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
+            // return loanApplicationNumber;
             return "12345";
         }
 
         private String getLoanRequestStatus(String loanApplicationNumber) {
-            // Simulated loan request status retrieval logic
-            // Replace with your own implementation
+            // try {
+            // String query = "SELECT status FROM loans WHERE loan_application_number = ?";
+            // PreparedStatement statement = connection.prepareStatement(query);
+            // statement.setString(1, loanApplicationNumber);
+            // ResultSet resultSet = statement.executeQuery();
+            // if (resultSet.next()) {
+            // return resultSet.getString("status");
+            // }
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
+            // return null;
+
             return "Granted";
         }
 
         private String getLoanDetails(String loanApplicationNumber) {
-            // Simulated loan details retrieval logic
-            // Replace with your own implementation
+            // StringBuilder loanDetails = new StringBuilder();
+            // try {
+            // String query = "SELECT * FROM loans WHERE loan_application_number = ?";
+            // PreparedStatement statement = connection.prepareStatement(query);
+            // statement.setString(1, loanApplicationNumber);
+            // ResultSet resultSet = statement.executeQuery();
+            // if (resultSet.next()) {
+            // double amount = resultSet.getDouble("amount");
+            // int paymentPeriod = resultSet.getInt("payment_period");
+            // loanDetails.append("Amount: ").append(amount).append(", Payment
+            // Period:").append(paymentPeriod);
+            // }
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
+            // return loanDetails.toString();
+
             return "Loan Details";
         }
 
         private void acceptLoan(String loanApplicationNumber) {
-            // Simulated loan acceptance logic
-            // Replace with your own implementation
+            // try {
+            // String query = "UPDATE loans SET status = 'Accepted' WHERE
+            // loan_application_number = ?";
+            // PreparedStatement statement = connection.prepareStatement(query);
+            // statement.setString(1, loanApplicationNumber);
+            // statement.executeUpdate();
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
         }
 
         private void rejectLoan(String loanApplicationNumber) {
-            // Simulated loan rejection logic
-            // Replace with your own implementation
+            // try {
+            // String query = "UPDATE loans SET status = 'Rejected' WHERE
+            // loan_application_number = ?";
+            // PreparedStatement statement = connection.prepareStatement(query);
+            // statement.setString(1, loanApplicationNumber);
+            // statement.executeUpdate();
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
         }
     }
 }
