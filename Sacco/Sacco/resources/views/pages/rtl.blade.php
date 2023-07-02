@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets') }}/img/apple-icon.png">
     <link rel="icon" type="image/png" href="{{ asset('assets') }}/img/favicon.png">
     <title>
-        Material Dashboard 2 by Creative Tim
+        Uprise Sacco
     </title>
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css"
@@ -36,7 +36,7 @@
                 </a>
         </div>
         <hr class="horizontal light mt-0 mb-2">
-        <div class="collapse navbar-collapse px-0 w-auto  max-height-vh-100" id="sidenav-collapse-main">
+        <div class="collapse navbar-collapse px-0 w-auto  max-height-vh-200 top-0" id="sidenav-collapse-main">
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link " href="{{ route('dashboard') }}">
