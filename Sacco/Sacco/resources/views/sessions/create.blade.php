@@ -1,14 +1,6 @@
 <x-layout bodyClass="bg-gray-200">
 
-        <div class="container position-sticky z-index-sticky top-0">
-            <div class="row">
-                <div class="col-12">
-                    <!-- Navbar -->
-                    <x-navbars.navs.guest signin='login' signup='register'></x-navbars.navs.guest>
-                    <!-- End Navbar -->
-                </div>
-            </div>
-        </div>
+        
         <main class="main-content  mt-0">
             <div class="page-header align-items-start min-vh-100"
                 style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');">
@@ -22,9 +14,9 @@
                                         <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Sign in</h4>
                                         <div class="row mt-3">
                                             <h6 class='text-white text-center'>
-                                                <span class="font-weight-normal">Email:</span> admin@material.com
+                                                <span class="font-weight-normal"></span> UPRISE
                                                 <br>
-                                                <span class="font-weight-normal">Password:</span> secret</h6>
+                                                <span class="font-weight-normal"></span> SACCO</h6>
                                             <div class="col-2 text-center ms-auto">
                                                 <a class="btn btn-link px-3" href="javascript:;">
                                                     <i class="fa fa-facebook text-white text-lg"></i>

@@ -42,18 +42,12 @@ Route::post('sign-out', [SessionsController::class, 'destroy'])->middleware('aut
 Route::get('profile', [ProfileController::class, 'create'])->middleware('auth')->name('profile');
 Route::post('user-profile', [ProfileController::class, 'update'])->middleware('auth');
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('billing', function () {
-		return view('pages.billing');
-	})->name('billing');
+	Route::get('performance', function () {
+		return view('pages.performance');
+	})->name('performance');
 	Route::get('tables', function () {
 		return view('pages.tables');
 	})->name('tables');
-	Route::get('rtl', function () {
-		return view('pages.rtl');
-	})->name('rtl');
-	Route::get('virtual-reality', function () {
-		return view('pages.virtual-reality');
-	})->name('virtual-reality');
 	Route::get('notifications', function () {
 		return view('pages.notifications');
 	})->name('notifications');
@@ -64,7 +58,7 @@ Route::group(['middleware' => 'auth'], function () {
 		return view('pages.static-sign-up');
 	})->name('static-sign-up');
 	Route::get('user-management', function () {
-		return view('pages.laravel-examples.user-management');
+		return view('pages.laravel-examples.group-management');
 	})->name('user-management');
 	Route::get('user-profile', function () {
 		return view('pages.laravel-examples.user-profile');
