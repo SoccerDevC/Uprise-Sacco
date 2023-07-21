@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class UpriseServer {
-    private static final int PORT = 12345;
+    private static final int PORT = 12346;
     private List<Socket> clients;
     private Connection connection;
 
@@ -53,18 +53,17 @@ public class UpriseServer {
     }
 
     public void databaseConnect() throws IOException {
-        String url = "jdbc:mysql://localhost:3306/uprise sacco";
+        String url = "jdbc:mysql://localhost:3306/";
+        String dbName = "uprise sacco";
         String username = "root";
         String password = "";
 
         try {
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(url + dbName, username, password);
             System.out.println("Connection to database successful");
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
-
     }
 
     public static void main(String[] args) throws IOException {
@@ -76,6 +75,8 @@ public class UpriseServer {
     private class ClientHandler implements Runnable {
         private Socket clientSocket;
         private String username;
+        private String phoneNumber;
+        private final int passwordGenerator = 123;
 
         public ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -111,6 +112,23 @@ public class UpriseServer {
                             this.username = username;
                         } else {
                             writer.println("Invalid username or password.");
+                            writer.println("Please provide your member number and phone number registered:");
+                            String memberNumber = reader.readLine();
+                            String phoneNumber = reader.readLine();
+
+                            // Check if there is a match
+                            if (verifyMemberInfo(memberNumber, phoneNumber)) {
+                                // Generate password and provide it to the member
+                                String newPassword = generatePassword(username);
+                                writer.println("Password: " + newPassword);
+                                savePasswordToDatabase(username, newPassword);
+                            } else {
+                                // Provide reference number for follow-up
+                                String referenceNumber = generateReferenceNumber();
+                                writer.println("Please return after a day to access the system.");
+                                writer.println("Reference number: " + referenceNumber);
+                            }
+
                         }
                     } else if (loggedIn) {
                         if (command.equals("deposit")) {
@@ -177,20 +195,103 @@ public class UpriseServer {
             }
         }
 
+        // private boolean checkMembership(int memberNumber, int phoneNumber) {
+        // try {
+        // String query = "SELECT * FROM users WHERE memberNumber = ? AND phone Number =
+        // ?";
+        // PreparedStatement statement = connection.prepareStatement(query);
+        // statement.setInt(1, memberNumber);
+        // statement.setInt(2, phoneNumber);
+        // ResultSet resultSet = statement.executeQuery();
+        // return resultSet.next();
+        // } catch (SQLException e) {
+        // e.printStackTrace();
+        // }
+        // return false;
+
+        // }
+
         private boolean verifyLogin(String username, String password) {
-            // try {
-            // String query = "SELECT * FROM users WHERE username = ? AND password = ?";
-            // PreparedStatement statement = connection.prepareStatement(query);
-            // statement.setString(1, username);
-            // statement.setString(2, password);
-            // ResultSet resultSet = statement.executeQuery();
-            // return resultSet.next();
-            // } catch (SQLException e) {
-            // e.printStackTrace();
-            // }
-            // return false;
-            return true;
+            try {
+                String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, username);
+                statement.setString(2, password);
+                ResultSet resultSet = statement.executeQuery();
+                return resultSet.next();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return false;
+
         }
+
+        private void savePasswordToDatabase(String username, String newPassword) {
+            try {
+
+                // Prepare the update query
+                String query = "UPDATE users SET password = ? WHERE username = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                // Set the new password and username as parameters
+                statement.setString(1, newPassword);
+                statement.setString(2, username);
+
+                // Execute the update query
+                int rowsAffected = statement.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    System.out.println("Password updated successfully in the database.");
+                } else {
+                    System.out.println("Failed to update password in the database.");
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private boolean verifyMemberInfo(String memberNumber, String phoneNumber) {
+            try {
+                String query = "SELECT * FROM members WHERE member_number = ? AND phone_number = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1, Integer.parseInt(memberNumber));
+                statement.setInt(2, Integer.parseInt(phoneNumber));
+                ResultSet resultSet = statement.executeQuery();
+
+                return resultSet.next();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        private String generatePassword(String username) {
+            return username + "123";
+        }
+
+        private String generateReferenceNumber() {
+            // Generate and return a reference number for the member
+            // ...
+            return "generated_reference_number";
+        }
+
+        // private void addPassword(String username, String phoneNumber, String
+        // password) {
+        // try {
+        // String query = "INSERT INTO users (password) VALUES (?) WHERE username =" +
+        // username
+        // + " AND phone Number " + phoneNumber + "";
+        // PreparedStatement statement = connection.prepareStatement(query);
+        // statement.setString(1, password);
+        // statement.executeUpdate();
+        // System.out.println("Password added successfully.");
+        // } catch (SQLException e) {
+        // e.printStackTrace();
+        // }
+        // }
 
         private void processDeposit(double amount, LocalDate dateDeposited, int receiptNumber) {
             try {
