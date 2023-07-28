@@ -20,8 +20,7 @@ class CreateLoanRequestsTable extends Migration
             $table->integer('payment_period');
             $table->integer('receipt_number')->nullable();
 
-            $table->foreign('member_id')->references('member_id')->on('members');
-            $table->foreign('receipt_number')->references('receipt_number')->on('contributions');
+            
             
             $table->timestamps();
         });

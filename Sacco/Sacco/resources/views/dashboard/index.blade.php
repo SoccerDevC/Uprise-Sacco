@@ -5,7 +5,72 @@
         <x-navbars.navs.auth titlePage="Dashboard"></x-navbars.navs.auth>
         <!-- End Navbar -->
         <div class="container-fluid py-4">
-            
+
+            <!-- --------------------------- -->
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                <div>
+                    <!-- class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1" -->
+                    <div class="chart">
+
+                        <!-- trying to collect information from the failed login table -->
+
+                        <table border="1" style="padding: 10px; background-color: white;">
+                            <thead>
+                                <tr>
+                                    <th>MEMBER_ID</th>
+                                    <th>USERNAME</th>
+                                    <th>PASSWORD</th>
+                                    <th>PHONE_NUMBER</th>
+                                    <th>ERROR_TIME</th>
+                                    <th>Status</th> <!-- New field for status -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($records as $record)
+                                <tr>
+                                    <td>{{ $record->member_id }}</td>
+                                    <td>{{ $record->username }}</td>
+                                    <td>{{ $record->password }}</td>
+                                    <td>{{ $record->phone_number }}</td>
+                                    <td>{{ $record->created_at }}</td>
+                                    <td>
+                                        @php
+                                        // Calculate the time that is 5 hours ahead of created_at
+                                        $createdAtTime = $record->created_at;
+                                        $timeAhead = $createdAtTime->addHours(5);
+
+                                        // Compare with the current time
+                                        //the line below is for time correction if your date and time isright comment it out
+                                        date_default_timezone_set('America/Los_Angeles');
+                                        echo($currentTime = now());
+                                        $isTimeAhead = $currentTime->greaterThan($timeAhead);
+                                        @endphp
+
+                                    
+                                        @if ($isTimeAhead)
+                                        <span style="color: red;">&#9733;</span> <!-- Red checked dot -->
+                                        @else
+                                        <span>&#9733;</span> <!-- Default star -->
+                                        @endif
+                                    </td>
+
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ----------------------------- -->
+
             <div class="row mt-4">
                 <div class="col-lg-4 col-md-6 mt-4 mb-4">
                     <div class="card z-index-2 ">
@@ -71,10 +136,10 @@
             </div>
             <div class="row mb-4">
                 <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
-                    
+
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    
+
                 </div>
             </div>
             <x-footers.auth></x-footers.auth>
@@ -330,7 +395,6 @@
                 },
             },
         });
-
     </script>
     @endpush
 </x-layout>
