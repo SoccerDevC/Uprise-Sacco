@@ -18,8 +18,8 @@ class CreateLoanRequestsTable extends Migration
             $table->string('member_id');
             $table->decimal('loan_amount', 10, 2);
             $table->integer('payment_period');
-            $table->integer('receipt_number')->nullable();
-
+            $table->integer('recommended_funds');
+            $table->string('loan_approval_status');
             
             
             $table->timestamps();

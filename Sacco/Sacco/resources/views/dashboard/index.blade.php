@@ -6,15 +6,97 @@
         <!-- End Navbar -->
         <div class="container-fluid py-4">
 
+            <!-- ---------------LOAN REQUEST TABLES-------------- -->
+            <div style="margin:20px 10px; background-color:white; ">
+                <div>
+                    <div class="chart">
+                        <h3 style="text-align: center; margin-bottom: 20px;">LOAN REQUESTS</h3>
+
+                        <!-- Check if there are records to display -->
+                    
+                       @if (count($lines) > 0 && $lines->contains('loan_approval_status', null))
+                        <form action="{{ route('update_loan_approval') }}" method="POST">
+                        @csrf
+                        <table border="1" style="padding: 10px; background-color: white; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>MEMBER_ID</th>
+                                    <th>LOAN APPLICATION NUMBER</th>
+                                    <th>LOAN AMOUNT</th>
+                                    <th>PAYMENT PERIOD(MONTHS)</th>
+                                    <th>RECOMENDED FUNDS</th>
+                                    <th>REQUEST TIME</th>
+                                    <th>TIME STATUS</th>
+                                    <th>LOAN APPLICATION STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($lines as $line)
+                                <tr>
+                                    <td>{{ $line->member_id }}</td>
+                                    <td>{{ $line->loan_application_number }}</td>
+                                    <td>{{ $line->loan_amount }}</td>
+                                    <td>{{ $line->payment_period}}</td>
+                                    <td>{{ $line->recommended_funds}}</td>
+
+                                    <td>{{ $line->created_at }}</td>
+                                    <td>
+                                        @php
+                                        // Calculate the time that is 5 hours ahead of created_at
+                                        $createdAtTime = $line->created_at;
+                                        $timeAhead = $createdAtTime->addHours(5);
+
+                                        // Compare with the current time
+                                        //this next line is for date correction so if you have a working time variable it may not be needed
+                                        date_default_timezone_set('America/Los_Angeles');
+                                        $currentTime = now();
+
+                                        $isTimeAhead = $currentTime->greaterThan($timeAhead);
+                                        @endphp
+
+                                        @if ($isTimeAhead)
+                                        <span style="color: red;">&#9733;</span> <!-- Red star dot -->
+                                        @else
+                                        <span>&#9733;</span> <!-- Default star -->
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <select name="loan_approval_status[{{ $line->loan_application_number }}]" id="loan_approval_status_{{ $line->loan_application_number }}">>
+                                            <option value="">Not yet approved</option>
+                                            <option value="granted" @if($line->loan_approval_status === 'granted') selected @endif>Granted</option>
+                                            <option value="rejected" @if($line->loan_approval_status === 'rejected') selected @endif>Rejected</option>
+                                        </select>
+                                    </td>
+
+
+
+                                </tr>
+
+                                @endforeach
+                            </tbody>
+                            
+                        </table>
+                        <button type="submit">Submit</button>
+                    </form>    
+                        @else
+                        <p style="text-align: center; font-weight: bold;">No Loan Approval Requests as of yet</p>
+                        @endif
+                    
+                    </div>
+                </div>
+            </div>
+
+            <!-- ------------------------END OF LOAN REQUESTS TABLE--------------------------- -->
+
             <!-- --------------------------- -->
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                 <div>
-                    <!-- class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1" -->
                     <div class="chart">
+                        <h3 style="text-align: center; margin-bottom: 20px;">Failed Logins</h3>
 
-                        <!-- trying to collect information from the failed login table -->
-
-                        <table border="1" style="padding: 10px; background-color: white;">
+                        <!-- Check if there are records to display -->
+                        @if (count($records) > 0)
+                        <table border="1" style="padding: 10px; background-color: white; width: 100%;">
                             <thead>
                                 <tr>
                                     <th>MEMBER_ID</th>
@@ -22,7 +104,7 @@
                                     <th>PASSWORD</th>
                                     <th>PHONE_NUMBER</th>
                                     <th>ERROR_TIME</th>
-                                    <th>Status</th> <!-- New field for status -->
+                                    <th>STATUS</th> <!-- New field for status -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -40,15 +122,15 @@
                                         $timeAhead = $createdAtTime->addHours(5);
 
                                         // Compare with the current time
-                                        //the line below is for time correction if your date and time isright comment it out
+                                        //this next line is for date correction so if you have a working time variable it may not be needed
                                         date_default_timezone_set('America/Los_Angeles');
-                                        echo($currentTime = now());
+                                        $currentTime = now();
+
                                         $isTimeAhead = $currentTime->greaterThan($timeAhead);
                                         @endphp
 
-                                    
                                         @if ($isTimeAhead)
-                                        <span style="color: red;">&#9733;</span> <!-- Red checked dot -->
+                                        <span style="color: red;">&#9733;</span> <!-- Red star dot -->
                                         @else
                                         <span>&#9733;</span> <!-- Default star -->
                                         @endif
@@ -58,18 +140,76 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        @else
+                        <p style="text-align: center; font-weight: bold;">No failed logins as of yet</p>
+                        @endif
 
+                    </div>
+                </div>
+            </div>
+            <!-- --------------------------------------------------- -->
 
+            <!-- ---------------FAILED DEPOSITS TABLES-------------- -->
+            <div style="margin:20px 10px; background-color:white; ">
+                <div>
+                    <div class="chart">
+                        <h3 style="text-align: center; margin-bottom: 20px;">Failed Deposits</h3>
 
+                        <!-- Check if there are records to display -->
+                        @if (count($rows) > 0)
+                        <table border="1" style="padding: 10px; background-color: white; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>MEMBER_ID</th>
+                                    <th>RECEIPT NUMBER</th>
+                                    <th>AMOUNT</th>
+                                    <th>DATE</th>
+                                    <th>ERROR_TIME</th>
+                                    <th>STATUS</th> <!-- New field for status -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($rows as $row)
+                                <tr>
+                                    <td>{{ $row->member_id }}</td>
+                                    <td>{{ $row->receipt_number }}</td>
+                                    <td>{{ $row->amount }}</td>
+                                    <td>{{ $row->date }}</td>
+                                    <td>{{ $row->created_at }}</td>
+                                    <td>
+                                        @php
+                                        // Calculate the time that is 5 hours ahead of created_at
+                                        $createdAtTime = $row->created_at;
+                                        $timeAhead = $createdAtTime->addHours(5);
 
+                                        // Compare with the current time
+                                        //this next line is for date correction so if you have a working time variable it may not be needed
+                                        date_default_timezone_set('America/Los_Angeles');
+                                        $currentTime = now();
 
+                                        $isTimeAhead = $currentTime->greaterThan($timeAhead);
+                                        @endphp
+
+                                        @if ($isTimeAhead)
+                                        <span style="color: red;">&#9733;</span> <!-- Red star dot -->
+                                        @else
+                                        <span>&#9733;</span> <!-- Default star -->
+                                        @endif
+                                    </td>
+
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        @else
+                        <p style="text-align: center; font-weight: bold;">No failed Deposits as of yet</p>
+                        @endif
 
                     </div>
                 </div>
             </div>
 
-
-            <!-- ----------------------------- -->
+            <!-- ------------------------END OF FAILED_DEPOSITS TABLE--------------------------- -->
 
             <div class="row mt-4">
                 <div class="col-lg-4 col-md-6 mt-4 mb-4">

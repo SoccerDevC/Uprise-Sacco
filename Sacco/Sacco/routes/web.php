@@ -23,6 +23,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\FailedLoginController;
+use App\Http\Controllers\LoanApprovalController;
 
 
 Route::get('/', function () {
@@ -35,6 +36,7 @@ Route::get('sign-in', [SessionsController::class, 'create'])->middleware('guest'
 Route::post('sign-in', [SessionsController::class, 'store'])->middleware('guest');
 Route::post('verify', [SessionsController::class, 'show'])->middleware('guest');
 Route::post('reset-password', [SessionsController::class, 'update'])->middleware('guest')->name('password.update');
+Route::post('/update_loan_approval', [LoanApprovalController::class, 'update'])->name('update_loan_approval');
 
 
 Route::middleware(['web'])->group(function () {
