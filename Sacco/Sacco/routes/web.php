@@ -24,7 +24,8 @@ use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\FailedLoginController;
 use App\Http\Controllers\LoanApprovalController;
-
+use App\Http\Controllers\EmailsController;
+use App\Http\Controllers\PerformanceController;
 
 Route::get('/', function () {
 	return redirect('sign-in');
@@ -37,7 +38,8 @@ Route::post('sign-in', [SessionsController::class, 'store'])->middleware('guest'
 Route::post('verify', [SessionsController::class, 'show'])->middleware('guest');
 Route::post('reset-password', [SessionsController::class, 'update'])->middleware('guest')->name('password.update');
 Route::post('/update_loan_approval', [LoanApprovalController::class, 'update'])->name('update_loan_approval');
-
+Route::get('/emails', [EmailsController::class, 'email'])->name('emails');
+Route::get('/performance', [PerformanceController::class, 'show'])->name('performance');
 
 Route::middleware(['web'])->group(function () {
     Route::post('/upload', [UploadController::class, 'upload'])->name('upload');
@@ -54,15 +56,12 @@ Route::post('sign-out', [SessionsController::class, 'destroy'])->middleware('aut
 Route::get('profile', [ProfileController::class, 'create'])->middleware('auth')->name('profile');
 Route::post('user-profile', [ProfileController::class, 'update'])->middleware('auth');
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('performance', function () {
-		return view('pages.performance');
-	})->name('performance');
-	Route::get('tables', function () {
-		return view('pages.tables');
-	})->name('tables');
-	Route::get('notifications', function () {
-		return view('pages.notifications');
-	})->name('notifications');
+	
+	Route::get('uploads', function () {
+		return view('pages.uploads');
+	})->name('uploads');
+	
+	
 	Route::get('static-sign-in', function () {
 		return view('pages.static-sign-in');
 	})->name('static-sign-in');
