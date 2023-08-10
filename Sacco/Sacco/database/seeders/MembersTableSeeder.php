@@ -22,7 +22,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'kyobe john',
                 'username' => 'john',
                 'password' => Hash::make('M006'),
-                
+                'email' => 'kyobejohn@gmail.com',
                 'phone_number' => '756839483',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -32,7 +32,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'kabuye Musa',
                 'username' => 'musa',
                 'password' => Hash::make('M007'),
-                
+                'email' => 'kabuyemusa@gmail.com',
                 'phone_number' => '756831283',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -42,7 +42,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'mukisa kenneth',
                 'username' => 'kenneth',
                 'password' => Hash::make('M008'),
-                
+                'email' => 'mukisakenneth@gmail.com',
                 'phone_number' => '756847483',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -52,7 +52,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'naomi kankya',
                 'username' => 'kankya',
                 'password' => Hash::make('M009'),
-                
+                'email' => 'naomikankya@gmail.com',
                 'phone_number' => '756889483',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -62,7 +62,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'kikanzi ashiraf',
                 'username' => 'ashiraf',
                 'password' => Hash::make('M010'),
-                
+                'email' => 'kikanziashiraf@gmail.com',
                 'phone_number' => '756094483',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -72,7 +72,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'namataka patricia',
                 'username' => 'patricia',
                 'password' => Hash::make('M011'),
-                
+                'email' => 'namatakapatricia@gmail.com',
                 'phone_number' => '756839420',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -82,7 +82,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'assimwe precious',
                 'username' => 'precious',
                 'password' => Hash::make('M012'),
-            
+                'email' => 'assimweprecious@gmail.com',
                 'phone_number' => '756123483',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -92,7 +92,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'higenyi yurri',
                 'username' => 'yurri',
                 'password' => Hash::make('M013'),
-                
+                'email' => 'higenyiyurri@gmail.com',
                 'phone_number' => '706739483',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -102,7 +102,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'owembabazi jane',
                 'username' => 'jane',
                 'password' => Hash::make('M014'),
-                
+                'email' => 'owembabazijane@gmail.com',
                 'phone_number' => '709739483',
                 'created_at' => now(),
                 'updated_at' => now()
@@ -112,7 +112,7 @@ class MembersTableSeeder extends Seeder
                 'name' => 'ojok Amos',
                 'username' => 'amos',
                 'password' => Hash::make('M015'),
-                
+                'email' => 'ojokamosn@gmail.com',
                 'phone_number' => '712839483',
                 'created_at' => now(),
                 'updated_at' => now()

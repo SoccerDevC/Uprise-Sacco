@@ -10,7 +10,13 @@ class Deposits extends Model
 
     protected $fillable = ['member_id', 'receipt_number', 'amount', 'date'];
 
-    protected $primaryKey = 'receipt_no';
+    protected $primaryKey = 'receipt_number';
     public $incrementing = false;
+
+    public function setDateAttribute($value)
+    {
+        // Convert the date to 'yyyy-mm-dd' format
+        $this->attributes['date'] = date('Y-m-d', strtotime($value));
+    }
 }
 

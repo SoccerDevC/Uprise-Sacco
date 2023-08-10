@@ -27,7 +27,17 @@
                     </div>
                 @endif
 
-                    <table border="1pt">
+                <div class="row">
+    <div class="col-12">
+        
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">UPLOADED RECORDS</h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+                    <table class="table align-items-center mb-0">
                         <thead>
                             <tr>
                                 <th>RECEIPT NUMBER</th>
@@ -36,7 +46,6 @@
                                 <th>DATE</th>
                             </tr>
                         </thead>
-
                         <tbody>
                             <?php foreach ($rows as $row) : ?>
                                 <tr>
@@ -44,12 +53,16 @@
                                     <td><?php echo $row[1]; ?></td>
                                     <td><?php echo $row[2]; ?></td>
                                     <td><?php echo $row[3]; ?></td>
-
-                                    <!-- Add more columns if needed -->
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
 
                     
 

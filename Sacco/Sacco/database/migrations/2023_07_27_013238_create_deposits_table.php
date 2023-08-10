@@ -19,6 +19,7 @@ class CreateDepositsTable extends Migration
             $table->decimal('amount', 10, 2);
             $table->date('date');
 
+            
         });
     }
 
