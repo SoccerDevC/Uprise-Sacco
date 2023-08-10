@@ -13,6 +13,8 @@ class CreateMembersTable extends Migration
             
             $table->string('name');
             $table->string('username');
+            $table->integer('total_contributions');
+
             $table->string('password');
             $table->string('phone_number');
             

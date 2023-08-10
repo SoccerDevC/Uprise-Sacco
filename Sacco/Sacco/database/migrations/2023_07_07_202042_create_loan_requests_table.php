@@ -19,6 +19,10 @@ class CreateLoanRequestsTable extends Migration
             $table->decimal('loan_amount', 10, 2);
             $table->integer('payment_period');
             $table->integer('receipt_number')->nullable();
+            $table->decimal('recommended_funds', 10, 2);
+            $table->string('loan_approval_status');
+
+
 
             
             
