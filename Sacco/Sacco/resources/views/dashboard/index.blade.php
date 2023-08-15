@@ -6,6 +6,91 @@
         <!-- End Navbar -->
         <div class="container-fluid py-4">
 
+            <!-- --------HEADING------------------ -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card my-4">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                <h3 class="text-white text-center">
+                                    UPRISE SACCO
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ------------------------------------ -->
+
+             <!-- ===========================CHARTS====================================== -->
+            
+             <div class="row mt-4">
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                    <div class="card z-index-2 ">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                                <div class="chart">
+                                    <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="mb-0 ">Website Views</h6>
+                            <p class="text-sm ">Last Campaign Performance</p>
+                            <hr class="dark horizontal">
+                            <div class="d-flex ">
+                                <i class="material-icons text-sm my-auto me-1">schedule</i>
+                                <p class="mb-0 text-sm"> campaign sent 2 days ago </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                    <div class="card z-index-2  ">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                                <div class="chart">
+                                    <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="mb-0 "> Daily Sales </h6>
+                            <p class="text-sm "> (<span class="font-weight-bolder">+15%</span>) increase in today
+                                sales. </p>
+                            <hr class="dark horizontal">
+                            <div class="d-flex ">
+                                <i class="material-icons text-sm my-auto me-1">schedule</i>
+                                <p class="mb-0 text-sm"> updated 4 min ago </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mt-4 mb-3">
+                    <div class="card z-index-2 ">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                            <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
+                                <div class="chart">
+                                    <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="mb-0 ">Completed Tasks</h6>
+                            <p class="text-sm ">Last Campaign Performance</p>
+                            <hr class="dark horizontal">
+                            <div class="d-flex ">
+                                <i class="material-icons text-sm my-auto me-1">schedule</i>
+                                <p class="mb-0 text-sm">just updated</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!---------------end of graphs---------------------------------- -->
+
+
             <!-- ---------------LOAN REQUEST TABLES-------------- -->
 
             <div class="row">
@@ -25,19 +110,19 @@
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>MEMBER_ID</th>
-                                                <th>LOAN APPLICATION NUMBER</th>
+                                                <th>M.I.D</th>
+                                                <th style="word-break: break-all;">L.A.N</th>
                                                 <th>LOAN AMOUNT</th>
-                                                <th>PAYMENT PERIOD(MONTHS)</th>
-                                                <th>RECOMMENDED FUNDS</th>
+                                                <th style="word-break: break-all;">MONTHS</th>
+                                                <th style="word-break: break-all;">RECOMMENDED FUNDS</th>
                                                 <th>REQUEST TIME</th>
-                                                <th>TIME STATUS</th>
-                                                <th>LOAN APPLICATION STATUS</th>
+                                                <th>URGENCY</th>
+                                                <th style="word-break: break-all;"> STATUS</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($lines as $line)
-                                            @if ($line->loan_approval_status === null)
+
                                             <tr>
                                                 <td>{{ $line->member_id }}</td>
                                                 <td>{{ $line->loan_application_number }}</td>
@@ -75,7 +160,7 @@
                                                     </select>
                                                 </td>
                                             </tr>
-                                            @endif
+
                                             @endforeach
                                         </tbody>
                                     </table>
@@ -94,11 +179,15 @@
 
             <!-- ------------------------END OF LOAN REQUESTS TABLE--------------------------- -->
 
-            <!-- --------------------------- -->
+
+
+
+
+            <!-- ---------------------------------FAILED LOGIN TABLE--------------------------- -->
             <div class="row">
                 <div class="col-12">
                     <div class="card my-4">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                             <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                                 <h3 class="text-white text-center">FAILED LOGINS</h3>
                             </div>
@@ -222,5 +311,8 @@
 
             <!-- ------------------------END OF FAILED_DEPOSITS TABLE--------------------------- -->
 
-            
+
+
+
+
 </x-layout>

@@ -9,24 +9,9 @@ use App\Models\Deposits;
 
 class Members extends Model
 {
-    use HasFactory;
-    protected $table = 'members';
-
-    
-
-    // Relationship with deposit history
-    public function depositHistory()
+    // Assuming you have a 'deposits' table related by member_id
+    public function deposits()
     {
-        return $this->hasMany(Deposits::class, 'member_id','member_id');
+        return $this->hasMany(Deposits::class, 'member_id', 'member_id');
     }
-
-    // Function to identify active members
-    public function isActiveMember()
-    {
-        $sixMonthsAgo = Carbon::now()->subMonths(6);
-
-        // Check if the user has deposits in the last 6 months
-        return $this->depositHistory()->whereDate('date', '>=', $sixMonthsAgo)->exists();
-    }
-
 }

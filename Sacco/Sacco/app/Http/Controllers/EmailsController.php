@@ -10,14 +10,12 @@ class EmailsController extends Controller
 {
     public function email()
     {
-        // Get only active members
-        $activeMembers = Members::whereHas('depositHistory', function ($member) {
-            $sixMonthsAgo = Carbon::now()->subMonths(6);
-            $member->where('date', '>=', $sixMonthsAgo);
+        $sixMonthsAgo = Carbon::now()->subMonths(6);
+
+        $activeMembers = Members::whereHas('deposits', function ($isActiveMember) use ($sixMonthsAgo) {
+            $isActiveMember->where('date', '>=', $sixMonthsAgo);
         })->get();
 
-        return view('pages.emails', [
-            'activeMembers' => $activeMembers,
-        ]);
+        return view('pages.emails', compact('activeMembers'));
     }
 }

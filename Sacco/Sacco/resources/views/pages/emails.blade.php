@@ -6,6 +6,46 @@
         <x-navbars.navs.auth titlePage="Emails"></x-navbars.navs.auth>
         <!-- End Navbar -->
         <div class="container-fluid py-4">
+
+            <!--=================== EMAIL SYSTEM BEGINS================= -->
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card my-4">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                            <div class="alert alert-warning alert-dismissible text-white">
+                                <h3 class="text-white text-center">Active Members</h3>
+                            </div>
+                        </div>
+                        <div class="card-body px-0 pb-2">
+                            <div class="table-responsive p-3">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <!-- Add more table headers here -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($activeMembers as $member)
+                                        <tr>
+                                            <td>{{ $member->name }}</td>
+                                            <td>{{ $member->email }}</td>
+                                            <!-- Add more table cells for additional member information -->
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--====================EMAIL SYSTEM ENDS===================  -->
+
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
                     <div class="card mt-4">
@@ -157,23 +197,23 @@
                 </div>
             </div>
 
+
             <!--=================== EMAIL SYSTEM BEGINS================= -->
 
             <div class="row">
                 <!-- Assuming this is your emails.blade.php view -->
-            
-                    <h1>Active Members List</h1>
-                    
-                    <ul>
-                        @foreach($activeMembers as $member)
-                        <li>{{ $member->member_id }} </li>
-                        @endforeach
-                    </ul>
 
+                <h1>Active Members List</h1>
+
+                @foreach($activeMembers as $member)
+                <p>Name: {{ $member->name }}</p>
+                <p>Email: {{ $member->email }}</p>
+                <!-- Add more member information here -->
+                @endforeach
             </div>
 
-
             <!--====================EMAIL SYSTEM ENDS===================  -->
+
 
             <x-footers.auth></x-footers.auth>
         </div>
