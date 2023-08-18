@@ -26,6 +26,7 @@ use App\Http\Controllers\FailedLoginController;
 use App\Http\Controllers\LoanApprovalController;
 use App\Http\Controllers\EmailsController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\PDFController;
 
 Route::get('/', function () {
 	return redirect('sign-in');
@@ -40,6 +41,7 @@ Route::post('reset-password', [SessionsController::class, 'update'])->middleware
 Route::post('/update_loan_approval', [LoanApprovalController::class, 'update'])->name('update_loan_approval');
 Route::get('/emails', [EmailsController::class, 'email'])->name('emails');
 Route::get('/performance', [PerformanceController::class, 'show'])->name('performance');
+Route::get('/pdf/{member_id}', [PDFController::class, 'generatePDF'])->name('pdf');
 
 Route::middleware(['web'])->group(function () {
     Route::post('/upload', [UploadController::class, 'upload'])->name('upload');

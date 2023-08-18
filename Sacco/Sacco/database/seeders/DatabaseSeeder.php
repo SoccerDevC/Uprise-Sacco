@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 use Database\Seeders\MembersTableSeeder;
-
+use Database\Seeders\DepositSeeder;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(MembersTableSeeder::class);
+        $this->call(DepositSeeder::class);
     }
 }

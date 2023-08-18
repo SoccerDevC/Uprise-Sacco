@@ -21,50 +21,50 @@
                 </head>
 
                 <body>
-                @if($message)
-                   <div id="success-message" class="alert alert-success">
-                    {{ $message }}
+                    @if($message)
+                    <div id="success-message" class="alert alert-success">
+                        {{ $message }}
                     </div>
-                @endif
+                    @endif
 
-                <div class="row">
-    <div class="col-12">
-        
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                    <h6 class="text-white text-capitalize ps-3">UPLOADED RECORDS</h6>
-                </div>
-            </div>
-            <div class="card-body px-0 pb-2">
-                <div class="table-responsive p-0">
-                    <table class="table align-items-center mb-0">
-                        <thead>
-                            <tr>
-                                <th>RECEIPT NUMBER</th>
-                                <th>MEMBER ID</th>
-                                <th>AMOUNT</th>
-                                <th>DATE</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($rows as $row) : ?>
-                                <tr>
-                                    <td><?php echo $row[0]; ?></td>
-                                    <td><?php echo $row[1]; ?></td>
-                                    <td><?php echo $row[2]; ?></td>
-                                    <td><?php echo $row[3]; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        
-    </div>
-</div>
+                    <div class="row">
+                        <div class="col-12">
+
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                    <h6 class="text-white text-capitalize ps-3">UPLOADED RECORDS</h6>
+                                </div>
+                            </div>
+                            <div class="card-body px-0 pb-2">
+                                <div class="table-responsive p-0">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>RECEIPT NUMBER</th>
+                                                <th>MEMBER ID</th>
+                                                <th>AMOUNT</th>
+                                                <th>DATE</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($rows as $row) : ?>
+                                                <tr>
+                                                    <td><?php echo $row[0]; ?></td>
+                                                    <td><?php echo $row[1]; ?></td>
+                                                    <td><?php echo $row[2]; ?></td>
+                                                    <td><?php echo $row[3]; ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
 
 
-                    
+
 
                 </body>
 
@@ -76,17 +76,17 @@
     <x-plugins></x-plugins>
 
 </x-layout>
-                  <script>
-                        // Function to hide the success message after 3 seconds
-                        function hideSuccessMessage() {
-                         var messageElement = document.getElementById('success-message');
-                         if (messageElement) {
-                         setTimeout(function() {
-                        messageElement.style.display = 'none';
-                        }, 3000); // 3000 milliseconds = 3 seconds
-                         }
-                        }
+<script>
+    // Function to hide the success message after 3 seconds
+    function hideSuccessMessage() {
+        var messageElement = document.getElementById('success-message');
+        if (messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 3000); // 3000 milliseconds = 3 seconds
+        }
+    }
 
-                         // Call the function when the page is loaded
-                         window.onload = hideSuccessMessage;
-                    </script>
+    // Call the function when the page is loaded
+    window.onload = hideSuccessMessage;
+</script>

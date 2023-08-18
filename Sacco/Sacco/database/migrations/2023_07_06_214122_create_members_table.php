@@ -14,6 +14,10 @@ class CreateMembersTable extends Migration
             $table->string('username');
             $table->integer('total_contributions');
 
+            // Additional Fields
+            $table->integer('previous_loan_performance'); // Change the default value as needed
+            $table->integer('loan_progress')->nullable(); // Change the default value as needed
+
             $table->string('password');
             $table->string('email');
             $table->string('phone_number');

@@ -198,21 +198,7 @@
             </div>
 
 
-            <!--=================== EMAIL SYSTEM BEGINS================= -->
-
-            <div class="row">
-                <!-- Assuming this is your emails.blade.php view -->
-
-                <h1>Active Members List</h1>
-
-                @foreach($activeMembers as $member)
-                <p>Name: {{ $member->name }}</p>
-                <p>Email: {{ $member->email }}</p>
-                <!-- Add more member information here -->
-                @endforeach
-            </div>
-
-            <!--====================EMAIL SYSTEM ENDS===================  -->
+            
 
 
             <x-footers.auth></x-footers.auth>
