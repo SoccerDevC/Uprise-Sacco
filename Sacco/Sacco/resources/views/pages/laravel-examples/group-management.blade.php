@@ -33,7 +33,7 @@
                                                    status</th>
                                                 <th
                                                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                    student no</th>
+                                                    student no.</th>
                                                 <th class="text-secondary opacity-7"></th>
                                             </tr>
                                         </thead>
@@ -80,7 +80,7 @@
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
                                                         <div>
-                                                            <img src="{{ asset('assets') }}/img/team-3.jpg"
+                                                            <img src="{{ asset('assets') }}/img/Melv.jpg"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user2">
                                                         </div>
@@ -118,7 +118,7 @@
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
                                                         <div>
-                                                            <img src="{{ asset('assets') }}/img/team-4.jpg"
+                                                            <img src="{{ asset('assets') }}/img/Conrad1.jpg"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user3">
                                                         </div>
