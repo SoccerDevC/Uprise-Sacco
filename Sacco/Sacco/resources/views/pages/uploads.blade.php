@@ -17,7 +17,7 @@
             @csrf
             <div class="mb-3">
                 <label for="csv_file" class="form-label">Upload CSV File</label>
-                <input type="file" class="form-control" id="csv_file" name="csv_file">
+                <input style="position: static;top: 20px;left: 5%;border: 4px dashed red;font-family: serif;" type="file" class="form-control" id="csv_file" name="csv_file">
             </div>
             <button type="submit" class="btn btn-primary">Upload</button>
 

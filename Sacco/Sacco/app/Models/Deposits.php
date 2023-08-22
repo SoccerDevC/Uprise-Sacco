@@ -18,5 +18,9 @@ class Deposits extends Model
         // Convert the date to 'yyyy-mm-dd' format
         $this->attributes['date'] = date('Y-m-d', strtotime($value));
     }
+    public function member()
+    {
+        return $this->belongsTo(Members::class);
+    }
 }
 

@@ -22,68 +22,91 @@
             </div>
             <!-- ------------------------------------ -->
 
-             <!-- ===========================CHARTS====================================== -->
-            
-             <div class="row mt-4">
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
-                    <div class="card z-index-2 ">
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-                                <div class="chart">
-                                    <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
+            <!-- ===========================CHARTS====================================== -->
+
+            <div class="row mt-4">
+                <div class="col-lg-3 col-md-6 mt-4 mb-4">
+
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                        <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                            <div class="chart">
+                                <div class="card-body text-center">
+                                    <h6 class="mb-0 text-blue"> Members </h6>
+
+                                    <p class="text-white display-4 my-4"> <span class="font-weight-bolder">{{ $members->count() }}</span> </p>
+                                    <hr class="dark horizontal">
+                                    <div class="d-flex ">
+                                        <i class="material-icons text-sm my-auto me-1 text-white">schedule</i>
+                                        <p class="mb-0 text-sm text-white">
+                                            Updated:
+                                            @if ($members->count() > 0)
+                                            {{ $members->max('updated_at')->diffForHumans() }}                                            @else
+                                            No updates yet
+                                            @endif
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <h6 class="mb-0 ">Website Views</h6>
-                            <p class="text-sm ">Last Campaign Performance</p>
-                            <hr class="dark horizontal">
-                            <div class="d-flex ">
-                                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                                <p class="mb-0 text-sm"> campaign sent 2 days ago </p>
-                            </div>
-                        </div>
                     </div>
+
+
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
-                    <div class="card z-index-2  ">
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                                <div class="chart">
-                                    <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
+                <div class="col-lg-5 col-md-8 mt-4 mb-4">
+
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                        <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                            <div class="chart">
+                                <div class="card-body text-center">
+                                    <h6 class="mb-0 text-blue"> Total Contributions </h6>
+                                    @php
+                                    $totalContributions = $members->sum('total_contributions');
+                                    @endphp
+                                    <p class="text-white display-4 my-4"> <span class="font-weight-bolder">{{ $totalContributions }}</span> </p>
+                                    <hr class="dark horizontal">
+                                    <div class="d-flex ">
+                                        <i class="material-icons text-sm my-auto me-1 text-white">schedule</i>
+                                        <p class="mb-0 text-sm text-white">
+                                            Updated:
+                                            @if ($members->count() > 0)
+                                            {{ $members->max('updated_at')->diffForHumans() }}                                            @else
+                                            No updates yet
+                                            @endif
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <h6 class="mb-0 "> Daily Sales </h6>
-                            <p class="text-sm "> (<span class="font-weight-bolder">+15%</span>) increase in today
-                                sales. </p>
-                            <hr class="dark horizontal">
-                            <div class="d-flex ">
-                                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                                <p class="mb-0 text-sm"> updated 4 min ago </p>
-                            </div>
-                        </div>
                     </div>
+
+
+
+
                 </div>
                 <div class="col-lg-4 mt-4 mb-3">
-                    <div class="card z-index-2 ">
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                            <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
-                                <div class="chart">
-                                    <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
+
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                        <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
+
+
+                            <div class="chart">
+                                <div class="card-body text-center">
+                                    <h6 class="mb-0 text-blue"> Registered Loans </h6>
+
+                                    <p class="text-white display-4 my-4"> <span class="font-weight-bolder">{{ $loans->count() }}</span> </p>
+                                    <hr class="dark horizontal">
+                                    <div class="d-flex ">
+                                        <i class="material-icons text-sm my-auto me-1 text-white">schedule</i>
+                                        <p class="mb-0 text-sm text-white">
+                                           recently
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
-                        <div class="card-body">
-                            <h6 class="mb-0 ">Completed Tasks</h6>
-                            <p class="text-sm ">Last Campaign Performance</p>
-                            <hr class="dark horizontal">
-                            <div class="d-flex ">
-                                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                                <p class="mb-0 text-sm">just updated</p>
-                            </div>
-                        </div>
+
+
                     </div>
                 </div>
             </div>

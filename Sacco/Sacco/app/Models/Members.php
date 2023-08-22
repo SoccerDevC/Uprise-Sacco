@@ -31,4 +31,6 @@ class Members extends Model
 
     protected $primaryKey = 'member_id';
     public $incrementing = false;
+    protected $fillable = ['total_contributions']; // List of fillable fields
+
 }
