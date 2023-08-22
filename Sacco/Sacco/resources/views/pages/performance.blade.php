@@ -17,7 +17,7 @@
 
                     <body>
 
-                        <h3>Contributions Pie Chart</h3>
+                        <h3 style="text-align: center">CONTRIBUTIONS PIE CHART</h3>
                         <script src="{{ asset('assets') }}/js/chartjs.min.js"></script>
                         <div style="width: 80%; margin: auto;">
                             <canvas id="contributionsChart"></canvas>
@@ -78,7 +78,7 @@
 
 
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                        <h3>PREVIOUS LOAN PERFORMANCE CHART</h3>
+                        <h3 style="text-align: center">PREVIOUS LOAN PERFORMANCE CHART</h3>
                         <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
 
                             <script src="{{ asset('assets') }}/js/chartjs.min.js"></script>

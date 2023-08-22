@@ -9,15 +9,19 @@
             <!-- --------HEADING------------------ -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card my-4">
+                    {{-- <div class="card my-4"> --}}
                         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                            <div class="bg-dark shadow-primary border-radius-lg pt-4 pb-3">
+                                <div class="alert alert-warning alert-dismissible text-white">
                                 <h3 class="text-white text-center">
                                     UPRISE SACCO
                                 </h3>
+                                <h6 class=" text-center" style="font-style:italic; color:black">
+                                    Saving together, thriving together
+                                </h6>
                             </div>
                         </div>
-                    </div>
+                    {{-- </div> --}}
                 </div>
             </div>
             <!-- ------------------------------------ -->
@@ -28,7 +32,7 @@
                 <div class="col-lg-3 col-md-6 mt-4 mb-4">
 
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                        <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                        <div class="bg-success shadow-primary border-radius-lg py-3 pe-1">
                             <div class="chart">
                                 <div class="card-body text-center">
                                     <h6 class="mb-0 text-blue"> Members </h6>
@@ -52,13 +56,13 @@
 
 
                 </div>
-                <div class="col-lg-5 col-md-8 mt-4 mb-4">
+                <div class="col-lg-6 col-md-8 mt-4 mb-4">
 
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                        <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                        <div class="bg-gradient-secondary shadow-success border-radius-lg py-3 pe-1">
                             <div class="chart">
                                 <div class="card-body text-center">
-                                    <h6 class="mb-0 text-blue"> Total Contributions </h6>
+                                    <h6 class="mb-0 text-blue">Members' Total Contributions </h6>
                                     @php
                                     $totalContributions = $members->sum('total_contributions');
                                     @endphp
@@ -83,10 +87,10 @@
 
 
                 </div>
-                <div class="col-lg-4 mt-4 mb-3">
+                <div class="col-lg-3 mt-4 mb-3">
 
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                        <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
+                        <div class="bg-success shadow-dark border-radius-lg py-3 pe-1">
 
 
                             <div class="chart">
@@ -95,10 +99,10 @@
 
                                     <p class="text-white display-4 my-4"> <span class="font-weight-bolder">{{ $loans->count() }}</span> </p>
                                     <hr class="dark horizontal">
-                                    <div class="d-flex ">
+                                    <div class="d-flex">
                                         <i class="material-icons text-sm my-auto me-1 text-white">schedule</i>
                                         <p class="mb-0 text-sm text-white">
-                                           recently
+                                           Recently
                                         </p>
                                     </div>
                                 </div>
@@ -120,7 +124,8 @@
                 <div class="col-12">
                     <div class="card my-4">
                         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                            <div class="bg-dark shadow-primary border-radius-lg pt-4 pb-3">
+                                <div class="alert alert-warning alert-dismissible text-white">
                                 <h3 class="text-white text-center">LOAN REQUESTS</h3>
                             </div>
                         </div>
@@ -191,7 +196,7 @@
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
                             @else
-                            <p style="text-align: center; font-weight: bold;">No Loan Approval Requests as of yet</p>
+                            <p style="text-align: center; font-weight: bold;">No Loan Approval Requests yet</p>
                             @endif
                         </div>
                     </div>
@@ -211,7 +216,8 @@
                 <div class="col-12">
                     <div class="card my-4">
                         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                            <div class="bg-dark shadow-primary border-radius-lg pt-4 pb-3">
+                                <div class="alert alert-warning alert-dismissible text-white">
                                 <h3 class="text-white text-center">FAILED LOGINS</h3>
                             </div>
                         </div>
@@ -258,7 +264,7 @@
                                 </table>
                             </div>
                             @else
-                            <p class="text-center font-weight-bold mt-4">No failed logins as of yet</p>
+                            <p class="text-center font-weight-bold mt-4">No failed logins yet</p>
                             @endif
                         </div>
                     </div>
@@ -269,10 +275,11 @@
 
             <!-- ---------------FAILED DEPOSITS TABLES-------------- -->
             <div class="row">
-                <div class="col-12">
+                <div class="col-md-12">
                     <div class="card my-4">
                         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                            <div class="bg-dark shadow-primary border-radius-lg pt-4 pb-3">
+                                <div class="alert alert-warning alert-dismissible text-white">
                                 <h3 class="text-white text-center mb-0">FAILED DEPOSITS</h3>
                             </div>
                         </div>
@@ -323,7 +330,7 @@
                                     </tbody>
                                 </table>
                                 @else
-                                <p class="text-center font-weight-bold">No failed Deposits as of yet</p>
+                                <p class="text-center font-weight-bold">No failed Deposits available yet.</p>
                                 @endif
                             </div>
                         </div>

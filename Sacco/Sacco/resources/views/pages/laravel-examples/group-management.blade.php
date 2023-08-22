@@ -20,13 +20,13 @@
                                         <thead>
                                             <tr>
                                                 <th
-                                                    class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                    class="text-uppercase text-black text-secondary text-xxs font-weight-bolder opacity-7" style="font-color:black">
                                                     Name</th>
                                                     <th
                                                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                    email address</th>    
                                                 <th
-                                                    class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                                     Reg. Number</th>
                                                 <th
                                                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -41,11 +41,11 @@
                                             <tr>
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
-                                                        <div>
+                                                        {{-- <div>
                                                             <img src="{{ asset('assets') }}/img/team-2.jpg"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user1">
-                                                        </div>
+                                                        </div> --}}
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <h6 class="mb-0 text-sm">TUKWASIIBWE MARTIN</h6>
                                                             {{-- <p class="text-xs text-secondary mb-0">siibwemart@gmail.com
@@ -54,36 +54,36 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">siibwemart@gmail.com</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">siibwemart@gmail.com</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">22/U/21816/EVE</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">22/U/21816/EVE</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="badge badge-sm bg-gradient-success">Online</span>
+                                                    <span class="badge badge-sm bg-gradient-secondary">Online</span>
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <span
                                                         class="text-secondary text-xs font-weight-bold">2200721816</span>
                                                 </td>
                                                 <td class="align-middle">
-                                                    <a href="javascript:;"
+                                                    {{-- <a href="javascript:;"
                                                         class="text-secondary font-weight-bold text-xs"
                                                         data-toggle="tooltip" data-original-title="Edit user">
-                                                        Edit
-                                                    </a>
+                                                        {{-- Edit 
+                                                    </a> --}}
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
-                                                        <div>
+                                                         {{-- <div>
                                                             <img src="{{ asset('assets') }}/img/Melv.jpg"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
-                                                                alt="user2">
-                                                        </div>
+                                                                alt="user2"> 
+                                                        </div> --}}
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <h6 class="mb-0 text-sm">MAWEJJE MELVIN NATHAN</h6>
                                                             {{-- <p class="text-xs text-secondary mb-0">
@@ -92,36 +92,36 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">melvinmawejje@gmail.com</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">melvinmawejje@gmail.com</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">21/U/10242/EVE</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">21/U/10242/EVE</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="badge badge-sm bg-gradient-secondary">Online</span>
+                                                    <span class="badge badge-sm bg-gradient-success">Online</span>
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <span
                                                         class="text-secondary text-xs font-weight-bold">2100710242</span>
                                                 </td>
-                                                <td class="align-middle">
+                                                {{-- <td class="align-middle">
                                                     <a href="javascript:;"
                                                         class="text-secondary font-weight-bold text-xs"
                                                         data-toggle="tooltip" data-original-title="Edit user">
                                                         Edit
                                                     </a>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
-                                                        <div>
+                                                        {{-- <div>
                                                             <img src="{{ asset('assets') }}/img/Conrad1.jpg"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user3">
-                                                        </div>
+                                                        </div> --}}
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <h6 class="mb-0 text-sm">SERUMAGA CONRAD DAVID</h6>
                                                             {{-- <p class="text-xs text-secondary mb-0">
@@ -130,11 +130,11 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">cddavid2001@gmail.com</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">cddavid2001@gmail.com</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">21/U/05874/PS</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">21/U/05874/PS</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
@@ -144,22 +144,22 @@
                                                     <span
                                                         class="text-secondary text-xs font-weight-bold">2100705874</span>
                                                 </td>
-                                                <td class="align-middle">
+                                                {{-- <td class="align-middle">
                                                     <a href="javascript:;"
                                                         class="text-secondary font-weight-bold text-xs"
                                                         data-toggle="tooltip" data-original-title="Edit user">
                                                         Edit
                                                     </a>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
-                                                        <div>
+                                                        {{-- <div>
                                                             <img src="{{ asset('assets') }}/img/team-3.jpg"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user4">
-                                                        </div>
+                                                        </div> --}}
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <h6 class="mb-0 text-sm">MAJALIWA WILFRED</h6>
                                                             {{-- <p class="text-xs text-secondary mb-0">
@@ -168,11 +168,11 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">wilfredmajaliwa@gmail.com</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">wilfredmajaliwa@gmail.com</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">17/X/18558/EVE</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">17/X/18558/EVE</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
@@ -182,22 +182,22 @@
                                                     <span
                                                         class="text-secondary text-xs font-weight-bold">1700714382</span>
                                                 </td>
-                                                <td class="align-middle">
+                                                {{-- <td class="align-middle">
                                                     <a href="javascript:;"
                                                         class="text-secondary font-weight-bold text-xs"
                                                         data-toggle="tooltip" data-original-title="Edit user">
                                                         Edit
                                                     </a>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
-                                                        <div>
+                                                        {{-- <div>
                                                             <img src="{{ asset('assets') }}/img/team-2.jpg"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user5">
-                                                        </div>
+                                                        </div> --}}
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <h6 class="mb-0 text-sm">AMADILE MAJID</h6>
                                                             {{-- <p class="text-xs text-secondary mb-0">
@@ -206,11 +206,11 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">amadilemajid10@gmail.com</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">amadilemajid10@gmail.com</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0">20/U/23418</p>
+                                                    <p class="text-center text-xs font-weight-bold mb-0">20/U/23418</p>
                                                     <p class="text-xs text-secondary mb-0"></p>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
@@ -220,13 +220,13 @@
                                                     <span
                                                         class="text-secondary text-xs font-weight-bold">2000723418</span>
                                                 </td>
-                                                <td class="align-middle">
+                                                {{-- <td class="align-middle">
                                                     <a href="javascript:;"
                                                         class="text-secondary font-weight-bold text-xs"
                                                         data-toggle="tooltip" data-original-title="Edit user">
                                                         Edit
                                                     </a>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                             
                                         </tbody>
