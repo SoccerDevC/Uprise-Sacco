@@ -222,8 +222,10 @@
                             </div>
                         </div>
                         <div class="card-body px-0 pb-2">
-                            @if (count($records) > 0)
-                            <div class="table-responsive">
+                            @if (count($records) > 0 && $records->contains('message', null))
+                            <form action="{{ route('reference') }}" method="POST">
+                                @csrf
+                              <div class="table-responsive">
                                 <table class="table table-bordered table-hover mb-0">
                                     <thead>
                                         <tr>
@@ -232,6 +234,8 @@
                                             <th>PASSWORD</th>
                                             <th>PHONE_NUMBER</th>
                                             <th>ERROR_TIME</th>
+                                            <th>REF. NO</th>
+                                            <th>MESSAGE</th>
                                             <th>STATUS</th>
                                         </tr>
                                     </thead>
@@ -243,6 +247,8 @@
                                             <td>{{ $record->password }}</td>
                                             <td>{{ $record->phone_number }}</td>
                                             <td>{{ $record->created_at }}</td>
+                                            <td>{{ $record->reference_number }}</td>
+                                            <td><input type="text" name="message[{{ $record->reference_number }}]" value="{{ $record->message }}" class="form-control"></td>
                                             <td>
                                                 @php
                                                 $createdAtTime = $record->created_at;
@@ -263,6 +269,8 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
                             @else
                             <p class="text-center font-weight-bold mt-4">No failed logins yet</p>
                             @endif

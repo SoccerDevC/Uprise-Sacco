@@ -12,7 +12,10 @@ class Failed_Login extends Model
     protected $table = 'failed_login';
 
     
+    protected $fillable = ['message'];
 
+    protected $primaryKey = 'reference_number';
+    public $incrementing = false;
 
 
 }

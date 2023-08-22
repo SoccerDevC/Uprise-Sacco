@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('username');
             $table->string('password');
             $table->string('phone_number');
+            $table->integer('reference_number');
+            $table->string('message');
             $table->timestamps();
         });
     }

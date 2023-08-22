@@ -22,7 +22,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\UploadController;
-use App\Http\Controllers\FailedLoginController;
+use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\LoanApprovalController;
 use App\Http\Controllers\EmailsController;
 use App\Http\Controllers\PerformanceController;
@@ -39,6 +39,7 @@ Route::post('sign-in', [SessionsController::class, 'store'])->middleware('guest'
 Route::post('verify', [SessionsController::class, 'show'])->middleware('guest');
 Route::post('reset-password', [SessionsController::class, 'update'])->middleware('guest')->name('password.update');
 Route::post('/update_loan_approval', [LoanApprovalController::class, 'update'])->name('update_loan_approval');
+Route::post('/reference', [ReferenceController::class, 'update'])->name('reference');
 Route::get('/emails', [EmailsController::class, 'email'])->name('emails');
 Route::get('/performance', [PerformanceController::class, 'show'])->name('performance');
 Route::get('/pdf/{member_id}', [PDFController::class, 'generatePDF'])->name('pdf');
