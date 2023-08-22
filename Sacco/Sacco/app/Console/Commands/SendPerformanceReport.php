@@ -31,6 +31,6 @@ class SendPerformanceReport extends Command
             Mail::to($member->email)->send(new PerformanceReport($member));
         }
 
-        $this->info('Performance report emails sent successfully!');
+        $this->info('Performance report emails have been sent successfully!');
     }
 }
