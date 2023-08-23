@@ -24,18 +24,23 @@ public class UpriseClient {
             Scanner scanner = new Scanner(System.in);
             // do {
             System.out.println(
-                    "\n****************************************************");
+                    "\n************************************************************");
             System.out.println("\n" + //
-                    "     Welcome to Uprise Sacco Client Interface.");
+                    "             Welcome to Uprise Sacco Client Interface.");
 
             System.out.println(
-                    "To Access our services please login into the system.\n ");
-            System.out.println("                  ***Uprise***");
+                    "        To Access our services please login into the system.\n ");
+            System.out.println("                          ***Uprise***");
 
-            System.out.println("\nEnter the login command in the format provided below:\n ");
+            System.out.println("\n        Enter the login command in the format provided below:\n ");
 
-            System.out.println("               login username password ");
-            System.out.println("                   Enter command");
+            System.out.println("                       login username password ");
+            System.out.println("                                Or");
+            System.out.println("To check on a submitted claim enter reference number in the given format");
+            System.out.println(" ");
+            System.out.println("                   Referencenumber 000000000000");
+            System.out.println(" ");
+            System.out.println("                           Enter command");
             String logIn = scanner.nextLine();
             String[] loginArgs = logIn.split(" ");
 
@@ -154,6 +159,19 @@ public class UpriseClient {
                     // System.out.println("Your reference number is: " + referenceNumber);
 
                     // }
+
+                }
+            } else if (loginArgs[0].equalsIgnoreCase("referencenumber")) {
+                writer.println(logIn);
+                System.out.println(
+                        "\n*****************************************************************************************");
+                String referenceResponse;
+                while ((referenceResponse = reader.readLine()) != null) {
+                    if (referenceResponse
+                            .equals("@@@")) {
+                        break; // Stop printing when "END" is encountered
+                    }
+                    System.out.println(referenceResponse);
 
                 }
             } else {

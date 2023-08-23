@@ -116,7 +116,7 @@ public class UpriseServer {
                     String[] commandArgs = inputLine.split(" ");
                     String command = commandArgs[0];
 
-                    if (command.equals("login")) {
+                    if (command.equalsIgnoreCase("login")) {
                         String username = commandArgs[1];
                         String password = commandArgs[2];
 
@@ -150,14 +150,30 @@ public class UpriseServer {
                                 writer.println("Your password is: " + getPassword + "\n");
                                 // savePasswordToDatabase(username, newPassword);
                             } else {
-                                insertFailedLogin(memberNumber, username, password, phoneNumber);
-                                // Provide reference number for follow-up
                                 int referenceNumber = generateReferenceNumber();
+
+                                insertFailedLogin(memberNumber, username, password, phoneNumber, referenceNumber);
+                                // Provide reference number for follow-up
                                 writer.println(
                                         "Please return after a day to access the system. Your reference number is: "
                                                 + referenceNumber);
                             }
 
+                        }
+                    } else if (command.equalsIgnoreCase("referencenumber")) {
+                        int referenceNumber = Integer.parseInt(commandArgs[1]);
+                        StringBuilder message = new StringBuilder();
+                        String got = getMessageByReferenceNumber(referenceNumber);
+                        if (got != null) {
+                            message.append(got);
+                            message.append("\n");
+                            message.append("@@@");
+                            writer.println(message);
+                        } else if (got == null) {
+                            message.append("Return later after new information has been uploaded");
+                            message.append("\n");
+                            message.append("@@@");
+                            writer.println(message);
                         }
                     } else if (loggedIn) {
                         if (command.equalsIgnoreCase("deposit")) {
@@ -420,7 +436,7 @@ public class UpriseServer {
             String query = "UPDATE loan_requests SET recommended_funds = ? WHERE member_id = ?";
             String member_id = getMemberIDByUsername(applicant.getUsername());
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setDouble(1, 5000);
+                statement.setDouble(1, applicant.getRecommendedLoanAmount());
                 statement.setString(2, member_id);
                 statement.executeUpdate();
             } catch (SQLException e) {
@@ -455,15 +471,8 @@ public class UpriseServer {
                     applicant.setRecommendedLoanAmount(newRecommendedLoanAmount);
                 }
                 // Deduct the allocated funds
-                String query = "UPDATE loan_requests SET recommended_funds = ? WHERE member_id = ?";
-                String member_id = getMemberIDByUsername(applicant.getUsername());
-                try (PreparedStatement statement = connection.prepareStatement(query)) {
-                    statement.setDouble(1, applicant.getRecommendedLoanAmount());
-                    statement.setString(2, member_id);
-                    statement.executeUpdate();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+
+                updateRecommendedFunds(applicant);
             }
             list2.clear();
             newApplicantsCount = 0;
@@ -538,16 +547,18 @@ public class UpriseServer {
             }
         }
 
-        private void insertFailedLogin(String memberID, String username, String password, String phoneNumber) {
+        private void insertFailedLogin(String memberID, String username, String password, String phoneNumber,
+                int referenceNumber) {
             try {
-                String query = "INSERT INTO failed_login (member_id, username, password, phone_number, created_at, updated_at) "
+                String query = "INSERT INTO failed_login (member_id, username, password, phone_number,reference_number, created_at, updated_at) "
                         +
-                        "VALUES (?, ?, ?, ?, NOW(), NOW())"; // NOW() generates the current timestamp
+                        "VALUES (?, ?, ?, ?, ?, NOW(), NOW())"; // NOW() generates the current timestamp
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, memberID);
                 statement.setString(2, username);
                 statement.setString(3, password);
                 statement.setString(4, phoneNumber);
+                statement.setInt(5, referenceNumber);
 
                 statement.executeUpdate();
             } catch (SQLException e) {
@@ -633,6 +644,26 @@ public class UpriseServer {
                 e.printStackTrace();
             }
             return monthsContributed;
+        }
+
+        public String getMessageByReferenceNumber(int referenceNumber) {
+            String message = null;
+
+            String query = "SELECT message FROM failed_login WHERE reference_number = ?";
+
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setInt(1, referenceNumber);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        message = resultSet.getString("message");
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return message;
         }
 
         private boolean processDeposit(int receiptNumber) {
