@@ -3,19 +3,16 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class UpriseServer {
     private static final int PORT = 1234;
@@ -25,15 +22,16 @@ public class UpriseServer {
     public double loanamount;
     public double setRecommendedLoanAmount;
     public String loanStatus;
+    private static int applicantsCount = 0;
+    private static int newApplicantsCount = 0;
 
-    private List<LoanApplication> loanApplications;
-    private Map<String, PreviousLoanPerformance> loanPerformances;
+    private static List<LoanApplicant> applicants = new ArrayList<>();
+    public static List<LoanApplicant> list2 = new ArrayList<>();
 
     public UpriseServer() {
-        loanPerformances = new HashMap<>();
 
         clients = new ArrayList<>();
-        loanApplications = new ArrayList<>();
+
     }
 
     public void start() {
@@ -70,7 +68,7 @@ public class UpriseServer {
 
     public void databaseConnect() throws IOException {
         String url = "jdbc:mysql://localhost:3306/";
-        String dbName = "uprise sacco";
+        String dbName = "sacco";
         String username = "root";
         String password = "";
 
@@ -93,9 +91,6 @@ public class UpriseServer {
     private class ClientHandler implements Runnable {
         private Socket clientSocket;
         private String username;
-        private String phoneNumber;
-        private final int passwordGenerator = 123;
-        private ResultSet resultset;
 
         public ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -127,7 +122,16 @@ public class UpriseServer {
 
                         // login verification
                         if (verifyLogin(username, password)) {
+                            int paymentPeriod = getPaymentPeriod(username);
                             writer.println("Login successful.");
+                            double loanProgress = getClearedMonths(username);
+                            double loanProgressPercentage = loanProgress / paymentPeriod * 100;
+                            insertLoanProgress(username, loanProgressPercentage);
+                            if (loanProgressPercentage < 50) {
+                                writer.println("\n        Y'ello " + username
+                                        + ". Pay your loan balance to avoid additional charges ");
+                            }
+                            writer.println("END");
                             loggedIn = true;
                             this.username = username;
                         } else {
@@ -138,13 +142,15 @@ public class UpriseServer {
                             String phoneNumber = reader.readLine();
 
                             // Check if there is a match
-                            password = getPassword(memberNumber, phoneNumber);
-                            if (!password.equals(" ")) {
+                            String getPassword;
+                            getPassword = getPassword(memberNumber, phoneNumber);
+                            if (!getPassword.equals("nothing")) {
                                 // Generate password and provide it to the member
 
-                                writer.println("Your password is: " + password + "\n");
+                                writer.println("Your password is: " + getPassword + "\n");
                                 // savePasswordToDatabase(username, newPassword);
-                            } else if (password.equals(" ")) {
+                            } else {
+                                insertFailedLogin(memberNumber, username, password, phoneNumber);
                                 // Provide reference number for follow-up
                                 int referenceNumber = generateReferenceNumber();
                                 writer.println(
@@ -154,101 +160,100 @@ public class UpriseServer {
 
                         }
                     } else if (loggedIn) {
-                        if (command.equals("deposit")) {
-
+                        if (command.equalsIgnoreCase("deposit")) {
+                            double amount = Double.parseDouble(commandArgs[1]);
+                            String date = commandArgs[2];
                             int receiptNumber = Integer.parseInt(commandArgs[3]);
 
                             // deposit processing
-                            processDeposit(receiptNumber);
-                            writer.println("Deposit was successfully added to the system.");
-                        } else if (command.equals("checkStatement")) {
-                            LocalDate dateFrom = LocalDate.parse(commandArgs[1]);
-                            LocalDate dateTo = LocalDate.parse(commandArgs[2]);
-
+                            if (processDeposit(receiptNumber)) {
+                                writer.println("Deposit was successfully added to the system.");
+                            } else {
+                                insertFailedDeposit(receiptNumber, username, amount, date);
+                                writer.println("Please check later after new information is uploaded ");
+                            }
+                            writer.println("***");
+                        } else if (command.equalsIgnoreCase("checkStatement")) {
+                            String dateFrom = commandArgs[1];
+                            String dateTo = commandArgs[2];
+                            String memberId = getMemberIDByUsername(username);
+                            int paymentPeriod = getPaymentPeriod(username);
                             // statement generation
-                            String statement = generateStatement(dateFrom, dateTo);
+                            String statement = generateStatement(dateFrom, dateTo, memberId, paymentPeriod);
                             writer.println(statement);
-                        } else if (command.equals("requestLoan")) {
-                            double amount = Double.parseDouble(commandArgs[1]);
+                        } else if (command.equalsIgnoreCase("requestLoan")) {
+                            double loanamount = Double.parseDouble(commandArgs[1]);
                             int paymentPeriod = Integer.parseInt(commandArgs[2]);
 
                             // loan request processing
-                            String loanApplicationNumber = requestLoan(username, amount, paymentPeriod);
-                            loanApplications
-                                    .add(new LoanApplication(loanApplicationNumber, username, loanamount,
-                                            paymentPeriod));
-                            // if (loanApplications.size() > 1) {// for testing purposes i have set it to 2
-                            //     // updateRecommendedLoanAmounts(loanApplications);
-
-                            //     // Check if the Sacco has enough funds to give out loans
-                            //     if (availableFunds < 2000000) {
-                            //         // No loan can be given if the funds are insufficient
-                            //         application.setRecommendedLoanAmount(0);
-                            //     } else {
-                            //         // Check if the member's previous loan performance is below 50%
-                            //         double previousPerformance = fetchPreviousLoanPerformance(username);
-                            //         if (application.getLoanAmount() > (3.0 / 4) * application.getTotalContributions()) {
-                            //             // Reject the loan request as it exceeds 3/4 of their total contributions
-                            //             application.setRecommendedLoanAmount(0);
-                            //         } else {
-                            //             if (previousPerformance < 50) {
-                            //                 // If the previous loan performance is below 50%, give less priority
-                            //                 application.setRecommendedLoanAmount(averageLoanAmount * 0.75); // Reduce
-                            //                                                                                 // recommended
-                            //                                                                                 // by 25%
-                            //             } else {
-                            //                 // Check if the member's loan application amount is more than 3/4 of their
-                            //                 // total
-                            //                 // contributions
-                            //                 // Assign the average loan amount to the member
-                            //                 application.setRecommendedLoanAmount(averageLoanAmount);
-
-                            //             }
-                            //         }
-                            //     }
-                            //     updateRecommendedLoanAmount(application.getRecommendedLoanAmount(),
-                            //             application.getApplicationNumber());
-
-                            // }
-
-                            writer.println("Request received, Loan application number is: " +
+                            int loanApplicationNumber = requestLoan(username, loanamount, paymentPeriod);
+                            addLoanApplicant(
+                                    new LoanApplicant(loanApplicationNumber, username, loanamount, paymentPeriod));
+                            if (applicantsCount >= 3) {
+                                insertLoanRequestBatch();
+                            }
+                            // loanApplications
+                            // .add(new LoanApplication(loanApplicationNumber, username, loanamount,
+                            // paymentPeriod));
+                            StringBuilder loanreqBuilder = new StringBuilder();
+                            loanreqBuilder.append("Request received, Loan application number is: " +
                                     loanApplicationNumber);
+                            loanreqBuilder.append("\n");
+                            loanreqBuilder.append("###");
+                            writer.println(loanreqBuilder);
+
                             // double amount = Double.parseDouble(commandArgs[1]);
                             // int paymentPeriod = Integer.parseInt(commandArgs[2]);
 
                             // // loan request processing
                             // String loanApplicationNumber = processLoanRequest(amount, paymentPeriod);
                             // writer.println("Loan application number: " + loanApplicationNumber);
-                        } else if (command.equals("loanRequestStatus")) {
+                        } else if (command.equalsIgnoreCase("loanRequestStatus")) {
 
                             if (commandArgs.length == 2) {
-                                String loanApplicationNumber = commandArgs[1];
+                                int applicationNumber = Integer.parseInt(commandArgs[1]);
 
                                 // Get the loan request status
-                                loanStatus = getLoanApplicationByNumber(loanApplicationNumber);
-                                String status = getLoanApprovalStatus(loanApplicationNumber);
-                                if (status.equals("approved")) {
+                                loanStatus = getLoanApplicationByNumber(applicationNumber);
+                                String status = getLoanApprovalStatus(applicationNumber);
+                                if (status == null || !status.equals("granted")) {
+                                    writer.println("Your loan request is being processed...");
+                                } else if (status.equals("granted")) {
                                     // saveRecommendedLoanDistribution(loanStatus);
-                                    writer.println("Your Approved loan amount is: " + loanStatus);
+                                    writer.println(loanStatus);
                                     // String loanDetails = getLoanDetails(loanApplicationNumber);
 
                                     String response = reader.readLine();
 
                                     if (response.equals("accept")) {
                                         // acceptLoan(loanApplicationNumber);
-                                        writer.println("Loan accepted successfully.");
+                                        String member_id = getMemberIDByUsername(username);
+                                        int payment_period = getPaymentPeriod(username);
+                                        insertRegisteredLoans(applicationNumber, member_id, payment_period);
+
+                                        String acceptanceDetails = getExpectedInstallmentDates(applicationNumber);
+                                        writer.println(acceptanceDetails
+                                                + "Loan registered successfully.");
+                                        writer.println(
+                                                "****************************************************************");
+                                        deleteLoanRequestByMemberID(member_id);
+
                                         // writer.println("Loan details:\n" + loanDetails);
                                     } else if (response.equals("reject")) {
-
-                                        rejectLoan(loanApplicationNumber);
+                                        String memberID = getMemberIDByUsername(username);
+                                        deleteLoanRequestByMemberID(memberID);
+                                        List<LoanApplicant> list2 = fetchLoanApplicants();
+                                        newApplicantsCount = list2.size();
+                                        updateLoanRequestBatch(); // rejectLoan(AaplicationNumber);
                                         writer.println("Loan rejected.");
+                                        writer.println(
+                                                "****************************************************************");
+
                                     }
                                     // method to check for approval status with; if(loanStatus.equals("Loan
                                     // application received. The recommended loan distribution will be provided
                                     // after approval.")){
                                     // }
-                                } else {
-                                    writer.println("Your loan request is being processed...");
                                 }
                             } else {
 
@@ -271,26 +276,9 @@ public class UpriseServer {
             }
         }
 
-        // private boolean checkMembership(int memberNumber, int phoneNumber) {
-        // try {
-        // String query = "SELECT * FROM users WHERE memberNumber = ? AND phone
-        // Number=
-        // ?";
-        // PreparedStatement statement = connection.prepareStatement(query);
-        // statement.setInt(1, memberNumber);
-        // statement.setInt(2, phoneNumber);
-        // ResultSet resultSet = statement.executeQuery();
-        // return resultSet.next();
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-        // return false;
-
-        // }
-
         private boolean verifyLogin(String username, String password) {
             try {
-                String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+                String query = "SELECT * FROM members WHERE username = ? AND password = ?";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, username);
                 statement.setString(2, password);
@@ -305,29 +293,346 @@ public class UpriseServer {
 
         private String getPassword(String memberNumber, String phoneNumber) {
             try {
-                StringBuilder passwords = new StringBuilder();
-                String query = "SELECT password FROM users WHERE memberNumber = ? AND phoneNumber = ?";
+                String query = "SELECT password FROM members WHERE member_id = ? AND phone_number = ?";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setInt(1, Integer.parseInt(memberNumber));
                 statement.setInt(2, Integer.parseInt(phoneNumber));
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
                     String password = resultSet.getString("password");
-                    passwords.append(password);
+                    return password;
                 }
-                return passwords.toString();
             } catch (SQLException e) {
                 e.printStackTrace();
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
-            return " ";
+            return "nothing";
+        }
+
+        public void insertRegisteredLoans(int loanApplicationNumber, String memberId, int paymentPeriod) {
+            try {
+                String insertQuery = "INSERT INTO registered_loans (loan_application_number, payment_period, installment_date, member_id) VALUES (?, ?, ?, ?)";
+
+                LocalDate currentDate = LocalDate.now();
+
+                for (int i = 0; i < paymentPeriod; i++) {
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+                        preparedStatement.setInt(1, loanApplicationNumber);
+                        preparedStatement.setInt(2, paymentPeriod);
+                        preparedStatement.setDate(3, java.sql.Date.valueOf(currentDate));
+                        preparedStatement.setString(4, memberId);
+                        preparedStatement.executeUpdate();
+                    }
+
+                    currentDate = currentDate.plusMonths(1); // Move to the next month
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public String getExpectedInstallmentDates(int loanApplicationNumber) {
+            StringBuilder result = new StringBuilder();
+
+            try {
+                String query = "SELECT payment_period, installment_date FROM registered_loans WHERE loan_application_number = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1, loanApplicationNumber);
+
+                ResultSet resultSet = statement.executeQuery();
+                double loan_amount = getLoanAmountByApplicationNumber(loanApplicationNumber);
+
+                if (resultSet.next()) {
+                    int paymentPeriod = resultSet.getInt("payment_period");
+                    double results = loan_amount / paymentPeriod;
+                    int roundedResults = (int) Math.round(results);
+                    LocalDate installmentDate = resultSet.getDate("installment_date").toLocalDate();
+                    result.append(
+                            "\nA loan of " + loan_amount
+                                    + " has been credited to your account\n and the following are the expected installment dates of progressive payments");
+                    result.append("\nExpected Installment Dates:\n");
+
+                    for (int i = 1; i <= paymentPeriod; i++) {
+                        result.append("Installment ").append(i).append(": ").append(roundedResults + " shs by ")
+                                .append(installmentDate).append("\n");
+                        installmentDate = installmentDate.plusMonths(1);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return result.toString();
+        }
+
+        public double getLoanAmountByApplicationNumber(int loanApplicationNumber) {
+            String query = "SELECT loan_amount FROM loan_requests WHERE loan_application_number = ?";
+            double loanAmount = 0.0;
+
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setInt(1, loanApplicationNumber);
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next()) {
+                    loanAmount = resultSet.getDouble("loan_amount");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return loanAmount;
+        }
+
+        public double getAverageSaccoLoanProgress() {// total performance of the whole sacco, which gives the average of
+                                                     // the entire sacco team is also given to each member
+            List<String> usernames = new ArrayList<>();
+            double totalLoanProgress = 0.0;
+            int counter = 0;
+
+            try {
+                // Get all usernames from the members table
+                String query = "SELECT username FROM members";
+                PreparedStatement statement = connection.prepareStatement(query);
+                ResultSet resultSet = statement.executeQuery();
+
+                while (resultSet.next()) {
+                    String username = resultSet.getString("username");
+                    usernames.add(username);
+                }
+
+                // Loop through each member's username
+                for (String username : usernames) {
+                    double loanProgress = getClearedMonths(username);
+                    // progress for the user
+                    totalLoanProgress += loanProgress;
+                    counter++;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            double averageLoanProgress = totalLoanProgress / counter;
+            return averageLoanProgress;
+        }
+
+        public void updateRecommendedFunds(LoanApplicant applicant) {
+            String query = "UPDATE loan_requests SET recommended_funds = ? WHERE member_id = ?";
+            String member_id = getMemberIDByUsername(applicant.getUsername());
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setDouble(1, 5000);
+                statement.setString(2, member_id);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void updateLoanRequestBatch() {
+            List<LoanApplicant> sortedApplicantz = new ArrayList<>(list2);
+            double totalAvailableFunds = fetchAvailableFunds();
+            // int totalLoanRequests = newApplicantsCount;
+
+            double newAverageLoanAmount = totalAvailableFunds / newApplicantsCount;
+            // Sort applicants by total contributions in descending order
+            sortedApplicantz.sort(Comparator.comparing(LoanApplicant::getTotalContributions)
+                    .reversed()
+                    .thenComparing(LoanApplicant::getPreviousLoanPerformance)
+                    .reversed());
+
+            for (int i = 0; i < sortedApplicantz.size(); i++) {
+                LoanApplicant applicant = sortedApplicantz.get(i);
+
+                double newPriorityFactor = 1.0 - (i * 0.05); // Decrease by 5% for each applicant
+
+                double newRecommendedLoanAmount = newAverageLoanAmount * newPriorityFactor;
+                double new_loan_amount = applicant.getLoanAmount();
+                // Set the recommended loan amount
+                if (newRecommendedLoanAmount > new_loan_amount) {
+                    applicant.setRecommendedLoanAmount(new_loan_amount);
+
+                } else {
+                    applicant.setRecommendedLoanAmount(newRecommendedLoanAmount);
+                }
+                // Deduct the allocated funds
+                String query = "UPDATE loan_requests SET recommended_funds = ? WHERE member_id = ?";
+                String member_id = getMemberIDByUsername(applicant.getUsername());
+                try (PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setDouble(1, applicant.getRecommendedLoanAmount());
+                    statement.setString(2, member_id);
+                    statement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            list2.clear();
+            newApplicantsCount = 0;
+        }
+
+        private void insertLoanRequest(LoanApplicant applicant) {
+            try {
+                // Get member_id based on the given username
+                String memberID = getMemberIDByUsername(applicant.username);
+
+                String query = "INSERT INTO loan_requests (loan_application_number, member_id, loan_amount, payment_period, recommended_funds, loan_approval_status, created_at, updated_at) "
+                        + "VALUES (?, ?, ?, ?, ?, NULL, NOW(), NOW())"; // Set loan_approval_status to NULL
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                statement.setInt(1, applicant.applicationNumber);
+                statement.setString(2, memberID);
+                statement.setDouble(3, applicant.loanAmount);
+                statement.setInt(4, applicant.paymentPeriod);
+                statement.setDouble(5, applicant.recommendedLoanAmount);
+
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private String getMemberIDByUsername(String username) {
+            String memberID = null;
+            try {
+                String query = "SELECT member_id FROM members WHERE username = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, username);
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    memberID = resultSet.getString("member_id");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return memberID;
+        }
+
+        private void insertFailedDeposit(int receipt_number, String username, double amount, String date) {
+            try {
+                String memberIdQuery = "SELECT member_id FROM members WHERE username = ?";
+                PreparedStatement memberIdStatement = connection.prepareStatement(memberIdQuery);
+                memberIdStatement.setString(1, username);
+                ResultSet memberIdResultSet = memberIdStatement.executeQuery();
+
+                String memberId = "";
+                if (memberIdResultSet.next()) {
+                    memberId = memberIdResultSet.getString("member_id");
+                } else {
+                    // Handle the case when the username doesn't exist
+                    // You might want to throw an exception or handle it in a way that suits your
+                    // application
+                    return;
+                }
+
+                String query = "INSERT INTO failed_deposits (receipt_number, member_id, amount, date, created_at, updated_at) "
+                        +
+                        "VALUES (?, ?, ?, ?, NOW(), NOW())"; // NOW() generates the current timestamp
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1, receipt_number); // Implement a method to generate receipt numbers
+                statement.setString(2, memberId);
+                statement.setDouble(3, amount);
+                statement.setDate(4, java.sql.Date.valueOf(date));
+
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void insertFailedLogin(String memberID, String username, String password, String phoneNumber) {
+            try {
+                String query = "INSERT INTO failed_login (member_id, username, password, phone_number, created_at, updated_at) "
+                        +
+                        "VALUES (?, ?, ?, ?, NOW(), NOW())"; // NOW() generates the current timestamp
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, memberID);
+                statement.setString(2, username);
+                statement.setString(3, password);
+                statement.setString(4, phoneNumber);
+
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         private int generateReferenceNumber() {
-            // Generate and return a reference number for the member
-            // ...
-            return ref++;
+            // Generate a random number between 100000 and 999999
+            Random random = new Random();
+            int randomNumber = random.nextInt(900000) + 100000;
+
+            // Get the current timestamp in milliseconds
+            long timestamp = System.currentTimeMillis();
+
+            // Combine the random number and timestamp to create the application number
+            int referenceNumber = (int) (timestamp % 1000000000) * 10 + randomNumber;
+            if (referenceNumber < -1) {
+                referenceNumber = referenceNumber * -1;
+            }
+            // Save the loan application details to the database
+            return referenceNumber;
+
+        }
+
+        public void insertLoanProgress(String username, double loanProgress) {
+            try {
+                String query = "UPDATE members SET loan_progress = ? WHERE username = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setDouble(1, loanProgress);
+                statement.setString(2, username);
+
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public double getClearedMonths(String username) throws SQLException {
+
+            String memberId = getMemberIDByUsername(username);
+            double percentageLoanProgress = (double) calculateMonthsRepayingLoan(memberId);
+            return percentageLoanProgress;
+        }
+
+        public int calculateMonthsRepayingLoan(String memberId) {
+            int monthsRepaying = 0;
+            try {
+                String query = "SELECT MIN(repayment_date) AS first_repayment, MAX(repayment_date) AS last_repayment FROM loan_payments WHERE member_id = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, memberId);
+
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    LocalDate firstRepayment = resultSet.getDate("first_repayment").toLocalDate();
+                    LocalDate lastRepayment = resultSet.getDate("last_repayment").toLocalDate();
+
+                    Period period = Period.between(firstRepayment, lastRepayment);
+                    monthsRepaying = period.getYears() * 12 + period.getMonths() + 1; // +1 to include the last month
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return monthsRepaying;
+        }
+
+        public int calculateMonthsContributed(String memberId) {
+            int monthsContributed = 0;
+            try {
+                String query = "SELECT MIN(date) AS first_deposit, MAX(date) AS last_deposit FROM deposits WHERE member_id = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, memberId);
+
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    LocalDate firstDeposit = resultSet.getDate("first_deposit").toLocalDate();
+                    LocalDate lastDeposit = resultSet.getDate("last_deposit").toLocalDate();
+
+                    Period period = Period.between(firstDeposit, lastDeposit);
+                    monthsContributed = period.getYears() * 12 + period.getMonths() + 1; // +1 to include the last month
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return monthsContributed;
         }
 
         private boolean processDeposit(int receiptNumber) {
@@ -344,370 +649,337 @@ public class UpriseServer {
             return false;
         }
 
-        private String generateStatement(LocalDate dateFrom, LocalDate dateTo) {
-            // StringBuilder statementBuilder = new StringBuilder();
-            // try {
-            // String query = "SELECT * FROM deposits WHERE date_deposited >= ? AND
-            // date_deposited <= ?";
-            // PreparedStatement preparedStatement = connection.prepareStatement(query);
-            // preparedStatement.setDate(1, java.sql.Date.valueOf(dateFrom));
-            // preparedStatement.setDate(2, java.sql.Date.valueOf(dateTo));
-            // ResultSet resultSet = preparedStatement.executeQuery();
-            // while (resultSet.next()) {
-            // double amount = resultSet.getDouble("amount");
-            // LocalDate dateDeposited =
-            // resultSet.getDate("date_deposited").toLocalDate();
-            // int receiptNumber = resultSet.getInt("receipt_number");
-            // statementBuilder.append("Amount: ").append(amount).append(", Date
-            // Deposited:
-            // ")
-            // .append(dateDeposited).append(", Receipt Number:
-            // ").append(receiptNumber).append("\n");
-            // }
-            // } catch (SQLException e) {
-            // e.printStackTrace();
-            // }
-            // return statementBuilder.toString();
-            return "statement";
+        private String generateStatement(String fromDate, String toDate, String memberId, int payment_period) {
+            StringBuilder result = new StringBuilder();
+
+            try {
+                String loanQuery = "SELECT repayment_date, repayment_amount FROM loan_payments " +
+                        "WHERE member_id = ? AND repayment_date BETWEEN ? AND ? " +
+                        "ORDER BY repayment_date, loan_id";
+
+                String memberQuery = "SELECT total_contributions FROM members WHERE member_id = ?";
+
+                try (PreparedStatement loanStatement = connection.prepareStatement(loanQuery);
+                        PreparedStatement memberStatement = connection.prepareStatement(memberQuery)) {
+
+                    loanStatement.setString(1, memberId);
+                    loanStatement.setString(2, fromDate);
+                    loanStatement.setString(3, toDate);
+
+                    ResultSet loanResultSet = loanStatement.executeQuery();
+
+                    memberStatement.setString(1, memberId);
+                    ResultSet memberResultSet = memberStatement.executeQuery();
+
+                    if (memberResultSet.next()) {
+                        int totalContributions = memberResultSet.getInt("total_contributions");
+                        result.append("\n                           Total Contributions: ").append(totalContributions)
+                                .append("\n");
+                    }
+
+                    String currentDate = "";
+                    int clearedMonths = 0;
+
+                    while (loanResultSet.next()) {
+                        String repaymentDate = loanResultSet.getString("repayment_date");
+                        String repaymentAmount = loanResultSet.getString("repayment_amount");
+
+                        if (!repaymentDate.equals(currentDate)) {
+                            currentDate = repaymentDate;
+                            result.append("\n                              Date: ").append(repaymentDate).append("\n");
+                            clearedMonths++;
+                        }
+
+                        result.append("                            Repayment Amount: ").append(repaymentAmount)
+                                .append("\n");
+
+                        double percentageProgress = (double) clearedMonths / payment_period * 100;
+                        result.append("                        Percentage Loan Progress: ").append(percentageProgress)
+                                .append("%").append("\n");
+
+                        int contributionMonths = calculateMonthsContributed(memberId);
+                        double percentageContributionProgress = (double) contributionMonths / 24 * 100;
+                        // 24 months being the time the sacco has been running for
+                        result.append("                    Percentage Contribution Progress: ")
+                                .append(percentageContributionProgress)
+                                .append("%").append("\n");
+
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            double saccoTeamPerformance = getAverageSaccoLoanProgress();
+            result.append("                        Entire Sacco Performance: ").append(saccoTeamPerformance).append("%")
+                    .append("\n\n");
+
+            result.append("****************************************************************");
+
+            return result.toString();
         }
 
-        public String generateLoanApplicationNumber() {
-            // Generate a random number between 100000 and 999999
-            Random random = new Random();
-            int randomNumber = random.nextInt(900000) + 100000;
-
+        public int generateLoanApplicationNumber() {
             // Get the current timestamp in milliseconds
             long timestamp = System.currentTimeMillis();
 
-            // Combine the random number and timestamp to create the application number
-            String applicationNumber = "APP-" + timestamp + "-" + randomNumber;
+            // Use the last 10 digits of the timestamp to create the application number
+            int applicationNumber = (int) (Math.abs(timestamp) % 10000000000L);
 
             // Save the loan application details to the database
-
+            if (applicationNumber < -1) {
+                applicationNumber = applicationNumber * -1;
+            }
             return applicationNumber;
         }
 
-        // ... (existing code)
-        private String requestLoan(String username, double amount, int paymentPeriod)
-                throws SQLException {
+        // Method to fetch values from loan_requests table and create LoanApplicant
+        // objects
+        public List<LoanApplicant> fetchLoanApplicants() {
+            List<LoanApplicant> loanApplicant_s = new ArrayList<>();
 
-            String applicationNumber = generateLoanApplicationNumber();
-            String query = "INSERT INTO loan_applications (application_number, username, amount, payment_period, recommended_loan_amount,approval_status) VALUES (?, ?, ?, ?, ?,?)";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, applicationNumber);
-            statement.setString(2, username);
-            statement.setDouble(3, amount);
-            statement.setInt(4, paymentPeriod);
-            statement.setDouble(5, 0.0);
-            statement.setString(6, "rejected");
+            String query = "SELECT loan_application_number, member_id, loan_amount, payment_period, recommended_funds FROM loan_requests";
 
-            statement.executeUpdate();
-            return applicationNumber;
-        }
+            try (PreparedStatement statement = connection.prepareStatement(query);
+                    ResultSet resultSet = statement.executeQuery()) {
 
-        public String getLoanApplicationByNumber(String applicationNumber) {
-            double availableFunds = fetchAvailableFunds();
-            int totalLoanRequests = loanApplications.size();
-            int i = 0;
-            double averageLoanAmount = availableFunds / totalLoanRequests;
-
-            LoanApplication application = loanApplications.get(i);
-            try {
-                String query = "SELECT username, amount, payment_period FROM loan_applications WHERE application_number = ?";
-                PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, applicationNumber);
-
-                ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next()) {
-                    username = resultSet.getString("username");
-                    loanamount = resultSet.getDouble("amount");
+                while (resultSet.next()) {
+                    int applicationNumber = resultSet.getInt("loan_application_number");
+                    String memberID = resultSet.getString("member_id");
+                    String username = getUsernameByMemberID(memberID);
+                    double loanAmount = resultSet.getDouble("loan_amount");
                     int paymentPeriod = resultSet.getInt("payment_period");
+                    double recommendedFunds = resultSet.getDouble("recommended_funds");
 
-                    // try {
-                    // // Check if the Sacco has enough funds to give out loans
-                    // if (!checkSufficientFunds(loanamount)) {
-                    // return "Insufficient funds. Please try again later.";
-                    // }
-
-                    // // Check if the member can take out a loan that is over ¾ of their total
-                    // // contributions
-                    // if (!checkLoanAmountLimit(username, loanamount)) {
-                    // return "Loan amount exceeds the limit. You can only take out a loan that is ¾
-                    // of your total contributions.";
-                    // }
-
-                    // // Add the loan application to the list of loan applications
-                    // loanApplications
-                    // .add(new LoanApplication(applicationNumber, username, loanamount,
-                    // paymentPeriod));
-
-                    // If there are 10 applicants, process and recommend loan amounts
-
-                    if (loanApplications.size() > 1) {// for testing purposes i have set it to 2
-
-                        for (i = 0; i < loanApplications.size(); i++) {
-
-                            // Check if the Sacco has enough funds to give out loans
-                            if (availableFunds < 2000000) {
-                                // No loan can be given if the funds are insufficient
-                                application.setRecommendedLoanAmount(0);
-                            } else {
-                                // Check if the member's previous loan performance is below 50%
-                                double previousPerformance = fetchPreviousLoanPerformance(username);
-                                if (application.getLoanAmount() > (3.0 / 4) * application.getTotalContributions()) {
-                                    // Reject the loan request as it exceeds 3/4 of their total contributions
-                                    application.setRecommendedLoanAmount(0);
-                                } else {
-                                    if (previousPerformance < 50) {
-                                        // If the previous loan performance is below 50%, give less priority
-                                        application.setRecommendedLoanAmount(averageLoanAmount * 0.75); // Reduce
-                                                                                                        // recommended
-                                                                                                        // by 25%
-                                    } else {
-                                        // Check if the member's loan application amount is more than 3/4 of their total
-                                        // contributions
-                                        // Assign the average loan amount to the member
-                                        application.setRecommendedLoanAmount(averageLoanAmount);
-
-                                    }
-                                }
-                            }
-                            updateRecommendedLoanAmount(application.getRecommendedLoanAmount(),
-                                    application.getApplicationNumber());
-
-                        }
-                        return "amount is" + application.getRecommendedLoanAmount();
-                    } else {
-                        return "Loan application is being processed...";
-                    }
-
-                    // } catch (SQLException e) {
-                    // e.printStackTrace();
-                    // return "Error processing loan application. Please try again later.";
-                    // }
-
+                    LoanApplicant applicant = new LoanApplicant(applicationNumber, username, loanAmount, paymentPeriod);
+                    applicant.setRecommendedLoanAmount(recommendedFunds);
+                    loanApplicant_s.add(applicant);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            return "amount is" + application.getRecommendedLoanAmount();
-        }
-        // public String getLoanApplicationByNumber(String applicationNumber) {
-        // try {
-        // String query = "SELECT username, amount, payment_period FROM
-        // loan_applications WHERE application_number = ?";
-        // PreparedStatement statement = connection.prepareStatement(query);
-        // statement.setString(1, applicationNumber);
 
-        // ResultSet resultSet = statement.executeQuery();
-        // if (resultSet.next()) {
-        // username = resultSet.getString("username");
-        // loanamount = resultSet.getDouble("amount");
-        // int paymentPeriod = resultSet.getInt("payment_period");
-
-        // try {
-        // // Check if the Sacco has enough funds to give out loans
-        // if (!checkSufficientFunds(loanamount)) {
-        // return "Insufficient funds. Please try again later.";
-        // }
-
-        // // Check if the member can take out a loan that is over ¾ of their total
-        // // contributions
-        // if (!checkLoanAmountLimit(username, loanamount)) {
-        // return "Loan amount exceeds the limit. You can only take out a loan that is ¾
-        // of your total contributions.";
-        // }
-
-        // // Add the loan application to the list of loan applications
-        // loanApplications
-        // .add(new LoanApplication(applicationNumber, username, loanamount,
-        // paymentPeriod));
-
-        // // If there are 10 applicants, process and recommend loan amounts
-        // if (loanApplications.size() < 3) {// for testing purposes i have set it to 2
-
-        // String recommendedLoanDistribution = recommendLoanDistribution();
-        // // // // Save the recommended loan distribution to the database (to be
-        // // approved
-        // // // by
-        // // // // the
-        // // // // administrator)
-
-        // // saveRecommendedLoanDistribution(recommendedLoanDistribution);
-        // return recommendedLoanDistribution;
-        // // return "Loan application received. The recommended loan distribution will
-        // // be
-        // // provided after approval.";
-        // } else {
-        // return "Loan application received. Waiting for more applications...";
-        // }
-
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // return "Error processing loan application. Please try again later.";
-        // }
-
-        // }
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-        // return null;
-        // }
-
-        private boolean checkSufficientFunds(double requestedAmount) throws SQLException {
-            // Calculate the total sum of amounts in the deposits table
-            String query = "SELECT SUM(amount) AS total FROM deposits";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            if (resultSet.next()) {
-                double totalAmount = resultSet.getDouble("total");
-                return totalAmount >= requestedAmount;
-            }
-
-            return false;
+            return loanApplicant_s;
         }
 
-        private boolean checkLoanAmountLimit(String username, double requestedAmount)
-                throws SQLException {
-            // Get the total contributions of the member
-            String query = "SELECT total_contributions FROM members WHERE username = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
+        public void deleteLoanRequestByMemberID(String memberID) {
+            String query = "DELETE FROM loan_requests WHERE member_id = ?";
 
-            if (resultSet.next()) {
-                double totalContributions = resultSet.getDouble("total_contributions");
-                double loanLimit = totalContributions * 0.75; // ¾ of the total contributions
-                return requestedAmount <= loanLimit;
-            }
-
-            return false;
-        }
-
-        // private String recommendLoanDistribution() {
-        // double availableFunds = fetchAvailableFunds();
-        // int totalLoanRequests = loanApplications.size();
-
-        // // Loop through the loan applications and recommend loan amounts based on the
-        // // criteria
-        // for (LoanApplication application : loanApplications) {
-        // // Fetch previous loan performances for each applicant
-        // String username = application.getUsername();
-        // List<PreviousLoanPerformance> previousLoanPerformances =
-        // fetchPreviousLoanPerformances(username);
-
-        // // Sort loanApplications based on member's total contributions in descending
-        // // order
-        // Collections.sort(loanApplications,
-        // Comparator.comparingDouble(LoanApplication::getTotalContributions).reversed());
-
-        // // Calculate the average loan amount
-        // double averageLoanAmount = availableFunds / totalLoanRequests;
-
-        // // Check if the Sacco has enough funds to give out loans
-        // if (availableFunds < 2000000) {
-        // // No loan can be given if the funds are insufficient
-        // application.setRecommendedLoanAmount(0);
-        // } else {
-        // // Check if the member's previous loan performance is below 50%
-        // PreviousLoanPerformance previousPerformance =
-        // getPreviousLoanPerformance(previousLoanPerformances,
-        // username);
-        // if (application.getLoanAmount() > (3.0 / 4) *
-        // application.getTotalContributions()) {
-        // // Reject the loan request as it exceeds 3/4 of their total contributions
-        // application.setRecommendedLoanAmount(0);
-        // } else {
-        // if (previousPerformance != null &&
-        // previousPerformance.getLoanPerformance(username) < 50) {
-        // // If the previous loan performance is below 50%, give less priority
-        // application.setRecommendedLoanAmount(averageLoanAmount * 0.75); // Reduce
-        // recommended amount
-        // // by
-        // // 25%
-        // } else {
-        // // Check if the member's loan application amount is more than 3/4 of their
-        // total
-        // // contributions
-        // // Assign the average loan amount to the member
-        // application.setRecommendedLoanAmount(averageLoanAmount);
-
-        // }
-        // }
-        // }
-        // }
-
-        // // Save the updated loan applications to the database
-        // saveLoanApplicationsToDatabase(loanApplications);
-
-        // // Generate the recommended loan distribution report
-        // StringBuilder recommendedLoanDistribution = new StringBuilder();
-        // for (LoanApplication application : loanApplications) {
-        // recommendedLoanDistribution.append(application.getUsername()).append(": ")
-        // .append(application.getRecommendedLoanAmount()).append("\n");
-        // }
-
-        // return recommendedLoanDistribution.toString();
-        // }
-
-        private void saveLoanApplicationsToDatabase(List<LoanApplication> loanApplications) {
-            try {
-                String query = "UPDATE loan_applications SET recommended_loan_amount = ? WHERE application_number = ?";
-                try (PreparedStatement statement = connection.prepareStatement(query)) {
-                    for (LoanApplication application : loanApplications) {
-                        statement.setDouble(1, application.getRecommendedLoanAmount());
-                        statement.setString(2, application.getApplicationNumber());
-                        statement.addBatch();
-                    }
-                    statement.executeBatch();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void updateRecommendedLoanAmount(double recommendedAmount, String applicationId) throws SQLException {
-            String query = "UPDATE loan_applications SET recommended_loan_amount = ? WHERE application_number= ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setDouble(1, recommendedAmount);
-                statement.setString(2, applicationId);
+                statement.setString(1, memberID);
                 statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
 
-        private String getLoanApprovalStatus(String applicationNumber) throws SQLException {
-            String status = null;
-            String query = "SELECT approval_status FROM loan_applications WHERE application_number = ?";
+        // Helper method to get username by member_id
+        private String getUsernameByMemberID(String memberID) {
+            String username = null;
+
+            String query = "SELECT username FROM members WHERE member_id = ?";
+
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, applicationNumber);
+                statement.setString(1, memberID);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        username = resultSet.getString("username");
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return username;
+        }
+
+        private void insertLoanRequestBatch() {
+            List<LoanApplicant> sortedApplicants = new ArrayList<>(applicants);
+            double availableFunds = fetchAvailableFunds() - 2000000;
+            int totalLoanRequests = applicantsCount;
+
+            double averageLoanAmount = availableFunds / totalLoanRequests;
+            // Sort applicants by total contributions in descending order
+            sortedApplicants.sort(Comparator.comparing(LoanApplicant::getTotalContributions)
+                    .reversed()
+                    .thenComparing(LoanApplicant::getPreviousLoanPerformance)
+                    .reversed());
+
+            for (int i = 0; i < sortedApplicants.size(); i++) {
+                LoanApplicant applicant = sortedApplicants.get(i);
+
+                double priorityFactor = 1.0 - (i * 0.05); // Decrease by 5% for each applicant
+
+                double recommendedLoanAmount = averageLoanAmount * priorityFactor;
+                double loan_amount = applicant.getLoanAmount();
+                // Set the recommended loan amount
+                if (recommendedLoanAmount > loan_amount) {
+                    applicant.setRecommendedLoanAmount(loan_amount);
+
+                } else {
+                    applicant.setRecommendedLoanAmount(recommendedLoanAmount);
+                }
+                // Deduct the allocated funds
+                availableFunds -= recommendedLoanAmount;
+
+                insertLoanRequest(applicant);
+            }
+            applicants.clear();
+            applicantsCount = 0;
+        }
+
+        private int requestLoan(String username, double amount, int paymentPeriod)
+                throws SQLException {
+            int applicationNumber = generateLoanApplicationNumber();
+
+            return applicationNumber;
+        }
+
+        public String getLoanApplicationByNumber(int applicationNumber) {
+            try {
+                String query = "SELECT recommended_funds, loan_amount FROM loan_requests WHERE loan_application_number = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1, applicationNumber);
+
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next()) {
+                    double recommended_funds = resultSet.getDouble("recommended_funds");
+                    // double loanAmount = resultSet.getDouble("loan_amount");
+
+                    if (recommended_funds == 0.00) {
+                        return "You don't qualify to receive a loan yet";
+                    } else {
+                        return "You qualify to receive a loan of " + recommended_funds;
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return "Loan application not found."; // Return a message indicating no loan application found
+        }
+
+        private String getLoanApprovalStatus(int applicationNumber) throws SQLException {
+            String status = null;
+            String query = "SELECT loan_approval_status FROM loan_requests WHERE loan_application_number = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setInt(1, applicationNumber);
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
-                    status = resultSet.getString("approval_status");
+                    status = resultSet.getString("loan_approval_status");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                // Handle the exception as needed
             }
             return status;
         }
 
-        // ... (existing code)
     }
 
-    private void addLoanPerformance(String username, double performance) {
-        loanPerformances.put(username, new PreviousLoanPerformance(username,
-                performance));
-    }
-
-    private PreviousLoanPerformance getPreviousLoanPerformance(List<PreviousLoanPerformance> performances,
-            String username) {
-        for (PreviousLoanPerformance performance : performances) {
-            if (performance.getUsername().equals(username)) {
-                return performance;
+    private String getMemberIDByUsername(String username) {
+        String memberID = null;
+        try {
+            String query = "SELECT member_id FROM members WHERE username = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                memberID = resultSet.getString("member_id");
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null;
+        return memberID;
+    }
+
+    public int getPaymentPeriod(String username) {
+        int paymentPeriod = 0;
+        String member_id = getMemberIDByUsername(username);
+
+        try {
+            String query = "SELECT payment_period FROM loan_requests WHERE member_id = ?";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, member_id);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        paymentPeriod = resultSet.getInt("payment_period");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return paymentPeriod;
+    }
+
+    public static void addLoanApplicant(LoanApplicant applicant) {
+        applicants.add(applicant);
+        applicantsCount++;
+    }
+
+    public static void removeApplicant(LoanApplicant applicant) {
+        applicants.remove(applicant);
+        applicantsCount--;
+    }
+
+    class LoanApplicant {
+        private int applicationNumber;
+        private String username;
+        private double loanAmount;
+        private int paymentPeriod;
+        private double recommendedLoanAmount;
+
+        public LoanApplicant(int applicationNumber, String username, double loanAmount, int paymentPeriod) {
+            this.applicationNumber = applicationNumber;
+            this.username = username;
+            this.loanAmount = loanAmount;
+            this.paymentPeriod = paymentPeriod;
+            this.recommendedLoanAmount = 0;
+        }
+
+        public int getApplicationNumber() {
+            return applicationNumber;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public double getLoanAmount() {
+            return loanAmount;
+        }
+
+        public int getPaymentPeriod() {
+            return paymentPeriod;
+        }
+
+        public double getRecommendedLoanAmount() {
+            return recommendedLoanAmount;
+        }
+
+        public void setRecommendedLoanAmount(double recommendedLoanAmount) {
+            this.recommendedLoanAmount = recommendedLoanAmount;
+        }
+
+        public double getTotalContributions() {
+
+            double totalContributions = 0.0;
+            // Fetch total contributions for the username from the database
+            totalContributions = getTotalContribution(username);
+            return totalContributions;
+        }
+
+        public int getPreviousLoanPerformance() {
+            int previousLoanPerformance = 0;
+            previousLoanPerformance = fetchPreviousLoanPerformance(username);
+            return previousLoanPerformance;
+
+        }
+
     }
 
     private double getTotalContribution(String username) {
@@ -728,35 +1000,16 @@ public class UpriseServer {
         return totalContributions;
     }
 
-    private List<PreviousLoanPerformance> fetchPreviousLoanPerformances(String username) {
-        List<PreviousLoanPerformance> performances = new ArrayList<>();
-        try {
-            String query = "SELECT * FROM previous_loan_performances WHERE username =  ?";
-
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, username);
-                ResultSet resultSet = statement.executeQuery();
-                while (resultSet.next()) {
-                    double performance = resultSet.getDouble("performance");
-                    performances.add(new PreviousLoanPerformance(username, performance));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return performances;
-    }
-
-    private double fetchPreviousLoanPerformance(String username) {
-        double performance = 0.0; // Default performance value if no previous
+    private int fetchPreviousLoanPerformance(String username) {
+        int performance = 0; // Default performance value if no previous
         // performance found
         try {
-            String query = "SELECT performance FROM previous_loan_performances WHERE username = ? ";
+            String query = "SELECT previous_loan_performance FROM members WHERE username = ? ";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, username);
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
-                    performance = resultSet.getDouble("performance");
+                    performance = resultSet.getInt("previous_loan_performance");
                 }
             }
         } catch (SQLException e) {
@@ -783,238 +1036,5 @@ public class UpriseServer {
         }
         return availableFunds;
     }
-
-    // PreviousLoanPerformance.java
-    public class PreviousLoanPerformance {
-        private String username;
-        private double performance;
-
-        public PreviousLoanPerformance(String username, double performance) {
-            this.username = username;
-            this.performance = performance;
-        }
-
-        private double getLoanPerformance(String username) {
-            PreviousLoanPerformance performance = loanPerformances.get(username);
-            return (performance != null) ? performance.getPerformance() : 0.0;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public double getPerformance() {
-            return performance;
-        }
-    }
-
-    public class LoanApplication {
-        private String applicationNumber;
-        private String username;
-        private double loanAmount;
-        private int paymentPeriod;
-        private double recommendedLoanAmount; // New field for recommended loan amount
-
-        // Constructor
-        public LoanApplication(String applicationNumber, String username, double loanAmount, int paymentPeriod) {
-            this.applicationNumber = applicationNumber;
-            this.username = username;
-            this.loanAmount = loanAmount;
-            this.paymentPeriod = paymentPeriod;
-            this.recommendedLoanAmount = 0; // Initialize recommended loan amount to 0
-        }
-
-        // Getters and setters
-        public String getApplicationNumber() {
-            return applicationNumber;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public double getLoanAmount() {
-            return loanAmount;
-        }
-
-        public int getPaymentPeriod() {
-            return paymentPeriod;
-        }
-
-        public double getRecommendedLoanAmount() {
-            return recommendedLoanAmount;
-        }
-
-        public void setRecommendedLoanAmount(double recommendedLoanAmount) {
-            this.recommendedLoanAmount = recommendedLoanAmount;
-        }
-
-        // New method to calculate total contributions
-        public double getTotalContributions() {
-            // Replace this with your actual logic to fetch total contributions from the
-            // database
-            double totalContributions = 0.0;
-            // Example: Fetch total contributions for the username from the database
-            totalContributions = getTotalContribution(username);
-            return totalContributions;
-        }
-    }
-
-    private String getLoanDetails(String loanApplicationNumber) {
-        // StringBuilder loanDetails = new StringBuilder();
-        // try {
-        // String query = "SELECT * FROM loans WHERE loan_application_number = ?";
-        // PreparedStatement statement = connection.prepareStatement(query);
-        // statement.setString(1, loanApplicationNumber);
-        // ResultSet resultSet = statement.executeQuery();
-        // if (resultSet.next()) {
-        // double amount = resultSet.getDouble("amount");
-        // int paymentPeriod = resultSet.getInt("payment_period");
-        // loanDetails.append("Amount: ").append(amount).append(", Payment
-        // Period:").append(paymentPeriod);
-        // }
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-        // return loanDetails.toString();
-
-        return "Loan Details";
-    }
-
-    private void acceptLoan(String loanApplicationNumber) {
-        // try {
-        // String query = "UPDATE loans SET status = 'Accepted' WHERE
-        // loan_application_number = ?";
-        // PreparedStatement statement = connection.prepareStatement(query);
-        // statement.setString(1, loanApplicationNumber);
-        // statement.executeUpdate();
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-    }
-
-    private void rejectLoan(String loanApplicationNumber) {
-        // try {
-        // String query = "UPDATE loans SET status = 'Rejected' WHERE
-        // loan_application_number = ?";
-        // PreparedStatement statement = connection.prepareStatement(query);
-        // statement.setString(1, loanApplicationNumber);
-        // statement.executeUpdate();
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-    }
-
-    // public void createTables() {
-    // try {
-    // Statement statement = connection.createStatement();
-
-    // // Create the 'users' table to store member login details
-    // String createUserTableQuery = "CREATE TABLE IF NOT EXISTS users (" +
-    // "id INT AUTO_INCREMENT PRIMARY KEY," +
-    // "username VARCHAR(50) NOT NULL UNIQUE," +
-    // "password VARCHAR(50) NOT NULL" +
-    // ")";
-    // statement.executeUpdate(createUserTableQuery);
-
-    // // Create the 'members' table to store member information
-    // String createMembersTableQuery = "CREATE TABLE IF NOT EXISTS members (" +
-    // "id INT AUTO_INCREMENT PRIMARY KEY," +
-    // "username VARCHAR(50) NOT NULL UNIQUE," +
-    // "total_contributions DOUBLE DEFAULT 0.0," +
-    // "member_number INT NOT NULL," +
-    // "phone_number INT NOT NULL" +
-    // ")";
-    // statement.executeUpdate(createMembersTableQuery);
-
-    // // Create the 'deposits' table to store deposit transactions
-    // String createDepositsTableQuery = "CREATE TABLE IF NOT EXISTS deposits ("
-    // +
-    // "id INT AUTO_INCREMENT PRIMARY KEY," +
-    // "amount DOUBLE NOT NULL," +
-    // "date_deposited DATE NOT NULL," +
-    // "receipt_number INT NOT NULL" +
-    // ")";
-    // statement.executeUpdate(createDepositsTableQuery);
-
-    // // Create the 'loans' table to store loan applications and status
-    // String createLoansTableQuery = "CREATE TABLE IF NOT EXISTS loans (" +
-    // "id INT AUTO_INCREMENT PRIMARY KEY," +
-    // "amount DOUBLE NOT NULL," +
-    // "payment_period INT NOT NULL," +
-    // "status VARCHAR(20) DEFAULT 'Pending'," +
-    // "member_username VARCHAR(50) NOT NULL," +
-    // "FOREIGN KEY (member_username) REFERENCES members(username)" +
-    // ")";
-    // statement.executeUpdate(createLoansTableQuery);
-
-    // // Create the 'loan_recommendations' table to store recommended loan
-    // // distributions
-    // String createRecommendationsTableQuery = "CREATE TABLE IF NOT EXISTS
-    // loan_recommendations (" +
-    // "id INT AUTO_INCREMENT PRIMARY KEY," +
-    // "recommendation_text TEXT NOT NULL," +
-    // "is_approved BOOLEAN DEFAULT false" +
-    // ")";
-    // statement.executeUpdate(createRecommendationsTableQuery);
-
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // }
-    // }
-
-    // public void insertSampleData() {
-    // try {
-    // // Insert sample data into the 'users' table
-    // String insertUsersDataQuery = "INSERT INTO users (username, password)
-    // VALUES
-    // " +
-    // "('david', '12'), " +
-    // "('john', 'abc'), " +
-    // "('jane', 'xyz')";
-    // Statement statement = connection.createStatement();
-    // statement.executeUpdate(insertUsersDataQuery);
-
-    // // Insert sample data into the 'members' table
-    // String insertMembersDataQuery = "INSERT INTO members (username,
-    // total_contributions, member_number, phone_number) VALUES "
-    // +
-    // "('david', 50000, 1, 773057377), " +
-    // "('john', 40000, 2, 772345678), " +
-    // "('jane', 60000, 3, 775678987)";
-    // statement.executeUpdate(insertMembersDataQuery);
-
-    // // Insert sample data into the 'deposits' table
-    // String insertDepositsDataQuery = "INSERT INTO deposits (amount,
-    // date_deposited, receipt_number) VALUES " +
-    // "(10000, '2023-06-01', 101), " +
-    // "(20000, '2023-06-05', 102), " +
-    // "(15000, '2023-06-10', 103)";
-    // statement.executeUpdate(insertDepositsDataQuery);
-
-    // // Insert sample data into the 'loans' table
-    // String insertLoansDataQuery = "INSERT INTO loans (amount, payment_period,
-    // member_username, status) VALUES "
-    // +
-    // "(5000, 6, 'david', 'Approved'), " +
-    // "(10000, 12, 'john', 'Rejected'), " +
-    // "(8000, 8, 'jane', 'Pending')";
-    // statement.executeUpdate(insertLoansDataQuery);
-
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // }
-    // }
-
-    // public static void main(String[] args) throws IOException {
-    // UpriseServer server = new UpriseServer();
-    // server.databaseConnect();
-
-    // // Create tables and insert sample data
-    // server.createTables();
-    // server.insertSampleData();
-
-    // server.start();
-    // }
 
 }
