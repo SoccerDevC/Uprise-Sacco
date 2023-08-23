@@ -125,6 +125,8 @@
                 <thead>
                     <tr>
                         <th>Loan Application Number</th>
+                        <th>Payment period</th>
+                        <th>Next Installment</th>
                         <!-- Add other loan-related columns here -->
                     </tr>
                 </thead>
@@ -132,6 +134,8 @@
                     @foreach ($member->registeredloans as $loan)
                     <tr>
                         <td>{{ $loan->loan_application_number }}</td>
+                        <td>{{ $loan->paymnt_period }}</td>
+                        <td>{{ $loan->installment_date }}</td>
                         <!-- Add other loan-related data here -->
                     </tr>
                     @endforeach
@@ -156,6 +160,10 @@
                     @foreach ($member->loanpayments as $payment)
                     <tr>
                         <td>{{ $payment->loan_application_number }}</td>
+                        <td>{{ $payment->loan_id }}</td>
+                        <td>{{ $payment->repayment_amount }}</td>
+                        <td>{{ $payment->repayment_date }}</td>
+                        <td>{{ $payment->receipt_number }}</td>
                         <!-- Add other loan-related data here -->
                     </tr>
                     @endforeach
