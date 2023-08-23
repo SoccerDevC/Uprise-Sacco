@@ -338,7 +338,7 @@
                                     </tbody>
                                 </table>
                                 @else
-                                <p class="text-center font-weight-bold">No failed Deposits available yet.</p>
+                                <p class="text-center font-weight-bold">No failed Deposits available yet</p>
                                 @endif
                             </div>
                         </div>

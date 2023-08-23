@@ -6,11 +6,11 @@
                     © <script>
                         document.write(new Date().getFullYear())
 
-                    </script>,
-                    made by G-6 <i class="fa fa-heart"></i> 
+                    </script>.
+                    Saving together, thriving together <i class="fa fa-heart"></i> 
                     <!-- <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a> &
                     <a href="https://www.updivision.com" class="font-weight-bold" target="_blank"> UPDIVISION</a>-->
-                    for a better web. 
+                    By G-6 group members 
                 </div>
             </div>
             <div class="col-lg-6">
