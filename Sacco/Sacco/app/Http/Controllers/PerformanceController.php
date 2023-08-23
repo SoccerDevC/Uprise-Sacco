@@ -11,6 +11,7 @@ class PerformanceController extends Controller
     public function show()
     {
         $members = Members::all(); // Retrieve member data from your database
+        $deposits = Deposits::all();
         $deposits =Deposits::all(); // Retrieve
         $data = [];
         $pack = [];

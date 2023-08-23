@@ -8,24 +8,23 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default mailer that is used to send any email
-    | messages sent by your application. Alternative mailers may be setup
+    | messages sent by the application. Alternative mailers may be setup
     | and used as needed; however, this mailer will be used by default.
     |
     */
 
-    'default' => env('MAIL_MAILER', 'smtp'),
+    'default' => env(key:'MAIL_MAILER', default:'smtp'),
 
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
     |--------------------------------------------------------------------------
     |
-    | Here you may configure all of the mailers used by your application plus
-    | their respective settings. Several examples have been configured for
-    | you and you are free to add your own as your application requires.
+    | Here we configure all of the mailers used by the application plus
+    | their respective settings. 
     |
     | Laravel supports a variety of mail "transport" drivers to be used while
-    | sending an e-mail. You will specify which one you are using for your
+    | sending an e-mail. You will specify which one you are using for the
     | mailers below. You are free to add additional mailers as required.
     |
     | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
@@ -34,16 +33,19 @@ return [
     */
 
     'mailers' => [
+        'mailtrap' => [
+            'transport' => 'mailtrap'
+        ],
         'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
-            'port' => env('MAIL_PORT', 587),
-            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
+            'host' => env(key:'MAIL_HOST', default:'smtp.mailgun.org'),
+            'port' => env(key:'MAIL_PORT', default:587),
+            'encryption' => env(key:'MAIL_ENCRYPTION', default:'tls'),
+            'username' => env(key:'MAIL_USERNAME'),
+            'password' => env(key:'MAIL_PASSWORD'),
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+            'local_domain' => env(key:'MAIL_EHLO_DOMAIN'),
         ],
 
         'ses' => [
@@ -66,12 +68,12 @@ return [
 
         'sendmail' => [
             'transport' => 'sendmail',
-            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+            'path' => env(key:'MAIL_SENDMAIL_PATH', default:'/usr/sbin/sendmail -bs -i'),
         ],
 
         'log' => [
             'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'channel' => env(key:'MAIL_LOG_CHANNEL'),
         ],
 
         'array' => [
@@ -99,7 +101,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'address' => env(key:'MAIL_FROM_ADDRESS', default:'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
