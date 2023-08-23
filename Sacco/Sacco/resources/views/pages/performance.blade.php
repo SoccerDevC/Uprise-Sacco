@@ -83,7 +83,7 @@
 
                             <script src="{{ asset('assets') }}/js/chartjs.min.js"></script>
                             <div style="width: 80%; margin: auto; height:30%;">
-                                <canvas id="previousPerformanceChart"></canvas>
+                                <canvas id="previousPerformanceChart" style="height: 400px"></canvas>
                             </div>
                 </body>
             </div>
