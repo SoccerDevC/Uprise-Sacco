@@ -5,28 +5,31 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Members;
+use Illuminate\Support\Collection; // Import Collection class
 
 class PerformanceReport extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $member;
+    protected $members;
+    protected $deposits;
+    protected $registeredLoans;
 
-    public function __construct(Members $member)
+    public function __construct(Collection $members, Collection $deposits, Collection $registeredLoans)
     {
-        $this->member = $member;
+        $this->members = $members;
+        $this->deposits = $deposits;
+        $this->registeredLoans = $registeredLoans;
     }
 
     public function build()
     {
         return $this->subject('Uprise Sacco Performance Report')
-            ->view('pdf')
+            ->view('pages.report')
             ->with([
-                'member' => $this->member,
-                'deposits' => $this->member->deposits,
-                'registeredloans' => $this->member->registeredloans,
-                'loanpayments' => $this->member->loanpayments,
+                'members' => $this->members,
+                'deposits' => $this->deposits,
+                'registeredLoans' => $this->registeredLoans,
             ]);
     }
 }
