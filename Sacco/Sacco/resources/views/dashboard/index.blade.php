@@ -169,7 +169,6 @@
                                                     //this next line is for date correction so if you have a working time variable it may not be needed
                                                     //date_default_timezone_set('America/Los_Angeles');
                                                     $currentTime = now();
-                                                    print(now());
 
                                                     $isTimeAhead = $currentTime->greaterThan($timeAhead);
                                                     @endphp
@@ -198,19 +197,19 @@
                                                         </td>
                                                     </tr>
 
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </form>
-                                    @else
-                                    <p style="text-align: center; font-weight: bold;">No Loan Approval Requests yet</p>
-                                    @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                            @else
+                            <p style="text-align: center; font-weight: bold;">No Loan Approval Requests yet</p>
+                            @endif
                         </div>
                     </div>
+                </div>
+            </div>
 
 
 
@@ -267,26 +266,26 @@
                                                                 $isTimeAhead = $currentTime->greaterThan($timeAhead);
                                                                 @endphp
 
-                                                                @if ($isTimeAhead)
-                                                                <span class="text-danger">&#9733;</span>
-                                                                @else
-                                                                <span>&#9733;</span>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Submit</button>
-                                        </form>
-                                        @else
-                                        <p class="text-center font-weight-bold mt-4">No failed logins yet</p>
-                                        @endif
-                                    </div>
-                                </div>
+                                                @if ($isTimeAhead)
+                                                <span class="text-danger">&#9733;</span>
+                                                @else
+                                                <span>&#9733;</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                            @else
+                            <p class="text-center font-weight-bold mt-4">No failed logins yet</p>
+                            @endif
                         </div>
+                    </div>
+                </div>
+            </div>
 
                         <!-- --------------------------------------------------- -->
 
@@ -336,24 +335,24 @@
                                                                 $isTimeAhead = $currentTime->greaterThan($timeAhead);
                                                                 @endphp
 
-                                                                @if ($isTimeAhead)
-                                                                <span style="color: red;">&#9733;</span> <!-- Red star dot -->
-                                                                @else
-                                                                <span>&#9733;</span> <!-- Default star -->
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
+                                                @if ($isTimeAhead)
+                                                <span style="color: red;">&#9733;</span> <!-- Red star dot -->
                                                 @else
-                                                <p class="text-center font-weight-bold">No failed Deposits available yet</p>
+                                                <span>&#9733;</span> <!-- Default star -->
                                                 @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                @else
+                                <p class="text-center font-weight-bold">No failed Deposits available yet</p>
+                                @endif
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
                             <!-- ------------------------END OF FAILED_DEPOSITS TABLE--------------------------- -->
