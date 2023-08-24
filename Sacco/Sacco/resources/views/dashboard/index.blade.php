@@ -168,6 +168,7 @@
                                                     //this next line is for date correction so if you have a working time variable it may not be needed
                                                     date_default_timezone_set('America/Los_Angeles');
                                                     $currentTime = now();
+                                                    print($currentTime);
 
                                                     $isTimeAhead = $currentTime->greaterThan($timeAhead);
                                                     @endphp
@@ -193,10 +194,11 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="submit" class="btn btn-secondary">Submit</button>
                             </form>
                             @else
-                            <p style="text-align: center; font-weight: bold;">No Loan Approval Requests yet</p>
+                            {{-- <p class="text-center; font-weight: bold;" style="color: blue">No Loan Approval Requests yet</p> --}}
+                            <p class="text-center font-weight-bold mt-4" style="color: darkblue">No Loan Approval Requests yet</p>
                             @endif
                         </div>
                     </div>
@@ -272,7 +274,7 @@
                             <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
                             @else
-                            <p class="text-center font-weight-bold mt-4">No failed logins yet</p>
+                            <p class="text-center font-weight-bold mt-4" style="color: darkblue">No failed logins yet</p>
                             @endif
                         </div>
                     </div>
@@ -338,7 +340,7 @@
                                     </tbody>
                                 </table>
                                 @else
-                                <p class="text-center font-weight-bold">No failed Deposits available yet</p>
+                                <p class="text-center font-weight-bold" style="color: darkblue">No failed Deposits available yet</p>
                                 @endif
                             </div>
                         </div>

@@ -50,10 +50,10 @@
                                                     <div class="d-flex px-2 py-1">
                                                         
                                                         {{-- <div>
-                                                            <img src="{{ asset('assets') }}/img/team-2.jpg"
+                                                            <img src="{{ URL('assets/img/icons/flags/MARTIN.png') }}"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user1">
-                                                        </div> --}}
+                                                        </div>  --}}
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <h6 class="mb-0 text-sm">TUKWASIIBWE MARTIN</h6>
                                                             {{-- <p class="text-xs text-secondary mb-0">siibwemart@gmail.com
@@ -95,11 +95,11 @@
                                                 
                                                 <td>
                                                     <div class="d-flex px-2 py-1">
-                                                         {{-- <div>
-                                                            <img src="{{ asset('assets') }}/img/Melv.jpg"
+                                                          {{-- <div>
+                                                            <img src="{{ URL('assets/img/icons/flags/MELVIN.png') }}"
                                                                 class="avatar avatar-sm me-3 border-radius-lg"
                                                                 alt="user2"> 
-                                                        </div> --}}
+                                                        </div>  --}}
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <h6 class="mb-0 text-sm">MAWEJJE MELVIN NATHAN</h6>
                                                             {{-- <p class="text-xs text-secondary mb-0">
