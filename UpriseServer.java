@@ -36,17 +36,18 @@ public class UpriseServer {
 
     public void start() {
         try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
-            System.out.println("Server started. Listening on port " + PORT);
+            try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+                System.out.println("Server started. Listening on port " + PORT);
 
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("New client connected: " + clientSocket);
+                while (true) {
+                    Socket clientSocket = serverSocket.accept();
+                    System.out.println("New client connected: " + clientSocket);
 
-                clients.add(clientSocket);
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
-                new Thread(clientHandler).start();
+                    clients.add(clientSocket);
+                    ClientHandler clientHandler = new ClientHandler(clientSocket);
+                    new Thread(clientHandler).start();
 
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
