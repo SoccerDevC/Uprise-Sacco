@@ -8,7 +8,7 @@ public class UpriseClient {
     private static final int SERVER_PORT = 1234;
     public static String memberNumber;
     public static String phoneNumber;
-    public static String logInResponse;a
+    public static String logInResponse;
     public static String command = " ";
 
     public void start() {
