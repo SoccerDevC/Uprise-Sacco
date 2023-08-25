@@ -33,9 +33,9 @@ class SendPerformanceReport extends Command
         $deposits = Deposits::all();
         $registeredLoans = Registered_Loans::all();
         // Loop through active members and send emails
-        
-            Mail::to('maestromelvin1@gmail.com')->send(new PerformanceReport($members,$deposits,$registeredLoans));
-        
+        foreach ($activeMembers as $member){
+            Mail::to($member->email)->send(new PerformanceReport($members,$deposits,$registeredLoans));
+        }
 
         $this->info('Performance report emails have been sent successfully!');
     }

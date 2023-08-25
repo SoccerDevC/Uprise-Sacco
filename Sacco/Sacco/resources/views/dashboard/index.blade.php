@@ -24,6 +24,7 @@
                         {{-- </div> --}}
                     </div>
                 </div>
+            </div>
                 <!-- ------------------------------------ -->
 
                 <!-- ===========================CHARTS====================================== -->
@@ -64,7 +65,7 @@
                                     <div class="card-body text-center">
                                         <h6 class="mb-0 text-blue">Members' Total Contributions </h6>
                                         @php
-                                        $totalContributions = $members->sum('total_contributions');
+                                        $totalContributions = $data->sum('amount');
                                         @endphp
                                         <p class="text-white display-4 my-4"> <span class="font-weight-bolder">{{ $totalContributions }}</span> </p>
                                         <hr class="dark horizontal">
@@ -72,10 +73,7 @@
                                             <i class="material-icons text-sm my-auto me-1 text-white">schedule</i>
                                             <p class="mb-0 text-sm text-white">
                                                 Updated:
-                                                @if ($members->count() > 0)
-                                                {{ $members->max('updated_at')->diffForHumans() }} @else
-                                                No updates yet
-                                                @endif
+                                                Recently
                                             </p>
                                         </div>
                                     </div>
@@ -210,6 +208,7 @@
                     </div>
                 </div>
             </div>
+            </div>
 
 
 
@@ -286,6 +285,7 @@
                     </div>
                 </div>
             </div>
+            </div>
 
                         <!-- --------------------------------------------------- -->
 
@@ -353,10 +353,13 @@
                     </div>
                 </div>
             </div>
+            </div>
+     
+            <x-footers.auth></x-footers.auth>
+     </div>
 
-
-                            <!-- ------------------------END OF FAILED_DEPOSITS TABLE--------------------------- -->
-
+</main>                      <!-- ------------------------END OF FAILED_DEPOSITS TABLE--------------------------- -->
+<x-plugins></x-plugins>
 
 
 

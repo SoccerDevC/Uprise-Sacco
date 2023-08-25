@@ -7,6 +7,7 @@ use App\Models\Failed_Deposits;
 use App\Models\Loan_Requests;
 use App\Models\Members;
 use App\Models\Registered_Loans;
+use App\Models\Deposits;
 
 class DashboardController extends Controller
 {
@@ -17,6 +18,7 @@ class DashboardController extends Controller
         $lines = $this->requests();
         $members = $this->members();
         $loans = $this->loans();
+        $data = $this->collect();
 
         return view('dashboard.index', [
             'records' => $records,
@@ -24,6 +26,7 @@ class DashboardController extends Controller
             'lines' => $lines,
             'members' => $members,
             'loans' => $loans,
+            'data' => $data,
         ]);
     }
 
@@ -55,5 +58,11 @@ class DashboardController extends Controller
     {
         $loans = Registered_Loans::all();
         return $loans;
+    }
+
+    public function collect()
+    {
+        $data = Deposits::all();
+        return $data;
     }
 }

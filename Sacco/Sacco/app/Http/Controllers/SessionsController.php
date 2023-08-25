@@ -32,7 +32,10 @@ class SessionsController extends Controller
 
         session()->regenerate();
 
-        return redirect('/dashboard');
+        return redirect('/dashboard')
+        ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
 
     }
 
@@ -81,7 +84,9 @@ class SessionsController extends Controller
     {
         auth()->logout();
 
-        return redirect('/sign-in');
+     return redirect('/sign-in')
+        ->header('Cache-Control', 'public')
+        ->header('Pragma', 'cache');
     }
 
 }

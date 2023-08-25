@@ -38,6 +38,7 @@
             @endif
         </form>
     </div>
+    <x-footers.auth></x-footers.auth>
 </div>
 
         </main>

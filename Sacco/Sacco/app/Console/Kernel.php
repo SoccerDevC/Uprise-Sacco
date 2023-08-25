@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('report:send')->everyTenMinutes();
+        $schedule->command('report:send')->hourlyAt(0);
 
     }
 
@@ -26,4 +26,9 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+
+    protected $routeMiddleware = [
+        // ... other middlewares
+        'cache.control' => \App\Http\Middleware\CacheControl::class,
+    ];
 }
